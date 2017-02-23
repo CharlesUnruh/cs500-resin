@@ -3,6 +3,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -85,6 +86,18 @@ public class DBManager {
     return rval;
   }
     
+  /**
+   *  Provides a PreparedStatement from an established connection.
+   */
+  public PreparedStatement prepareStatement(String statement_string) {
+    PreparedStatement rval = null;
+    try {
+      rval = _conn.prepareStatement(statement_string);
+    } catch (SQLException sqle) {
+      sqle.printStackTrace(System.err);
+    }
+    return rval;
+  }
   
   /**
    * Register a new student in the database.
