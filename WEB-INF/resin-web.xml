@@ -1,0 +1,32 @@
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" version="2.4"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http:/java.sun.com/dtd/web-app_2_3.dtd">
+  <servlet>
+    <servlet-name>registrar</servlet-name>
+    <servlet-class>edu.drexel.cs461.examples.RegistrarServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+	  <servlet-name>registrar</servlet-name>
+	  <url-pattern>/registrar</url-pattern>
+  </servlet-mapping>
+
+
+  <servlet>
+    <servlet-name>SongListServlet</servlet-name>
+    <servlet-class>playlist.SongListServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+	  <servlet-name>SongListServlet</servlet-name>
+	  <url-pattern>/songlist</url-pattern>
+  </servlet-mapping>
+
+
+  <servlet>
+    <servlet-name>hello</servlet-name>
+    <servlet-class>test.HelloServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+	  <servlet-name>hello</servlet-name>
+	  <url-pattern>/hello</url-pattern>
+  </servlet-mapping>
+</web-app>
