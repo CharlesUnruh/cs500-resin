@@ -1,10 +1,13 @@
 package playlist;
+import java.util.Date;
+import com.google.gson.Gson;
 
 /**
  * 
  * An implementation of the Song class.
  *  
  * @author Marc S. Thomson (marc.steven.thomson@drexel.edu) 
+ * @author Charles Unruh (ceu24@cs.drexel.edu)
  *
  */
 public class Song {
@@ -31,8 +34,13 @@ public class Song {
     _genre = genre;
   }
   
+  public String toJSON() {
+      Gson gson = new Gson();
+      return gson.toJson(this);
+   } 
+
   public String toHTML() {
-	  return "<tr><td>" + _title + "</td><td>" + _duration + "</td><td>" + _releaseDate + "</td><td>" + _band + "</td><td>" _album + "</td><td>" + _genre + "</td><td></tr>";
+	  return "<tr><td>" + _title + "</td><td>" + _duration + "</td><td>" + _releaseDate + "</td><td>" + _band + "</td><td>" + _album + "</td><td>" + _genre + "</td><td></tr>";
   }
 
 }

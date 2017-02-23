@@ -1,5 +1,4 @@
 package playlist;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,12 +8,12 @@ import java.util.ResourceBundle;
 
 /**
  * 
- * An implementation of the Registrar.
+ * Database Connection Manager.
  *  
- * @author Julia Stoyanovich (stoyanovich@drexel.edu) 
+ * @author Charles Unruh (ceu24@cs.drexel.edu)
  *
  */
-public class Registrar {
+public class DBManager {
   
   private static Connection _conn = null;
   private static ResourceBundle _bundle;
@@ -72,13 +71,27 @@ public class Registrar {
       sqle.printStackTrace(System.err);
     }
   }
+
+  /**
+   *   Provides a statement from an established connection.
+   */
+  public Statement createStatement() {
+    Statement rval = null;
+    try {
+      rval = _conn.createStatement();
+    } catch (SQLException sqle) {
+      sqle.printStackTrace(System.err);
+    }
+    return rval;
+  }
+    
   
   /**
    * Register a new student in the database.
    * @param newStudent
    * @return
    */
-  public Student registerStudent(Student newStudent) {
+/*  public Student registerStudent(Student newStudent) {
     try {
       int sid = 1 + DBUtils.getIntFromDB(_conn, "select max(sid) from Students");
       newStudent.setId(sid);
@@ -90,13 +103,14 @@ public class Registrar {
     }
     return newStudent;
   }
-  
+  */
   /**
    * Update the student's GPA in the database.
    * @param sid
    * @param gpa
    * @return
    */
+/*
   public Student setGPA(int sid, double gpa) {
     Student student = null;
     try {
@@ -121,11 +135,12 @@ public class Registrar {
     }
     return student;
   }
-  
+  */
   /**
    * Get the complete roster of students.
    * @return
    */
+/*
    public ArrayList<Student> getRoster() throws SQLException {
      
        ArrayList<Student> roster = new ArrayList<Student>();
@@ -173,7 +188,8 @@ public class Registrar {
 	  System.out.println(sqle.toString());
       }
   }
-  
+  */
+/*
   public static void main (String args[]) {
     
       if (args.length != 1) {
@@ -214,4 +230,5 @@ public class Registrar {
 	  reg.closeDBConnection();
       }
   }
+*/
 }
