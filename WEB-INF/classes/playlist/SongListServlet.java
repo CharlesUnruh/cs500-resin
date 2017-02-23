@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -15,7 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * 
- * @author Julia Stoyanovich
+ * @author Marc S. Thompson (marc.steven.thomson@drexel.edu)
+ * @author Charles Unruh (ceu24@cs.drexel.edu)
  *
  */
 public class SongListServlet extends HttpServlet {
@@ -33,33 +35,39 @@ public class SongListServlet extends HttpServlet {
      
        ArrayList<Song> songlist = new ArrayList<Song>();
        
-       String query = "select S.name as \"Title\", "; 
-			  query += "S.duration as \"Duration\", "; 
-			  query += "S.release_date as \"Release Date\", "; 
-			  query += "B.name as \"Band\", "; 
-			  query += "A.name as \"Album\", "; 
-			  query += "G.name as \"Genre\" "; 
-			  query += "from Songs S ";
-			  query += "inner join AlbumsSongs_Xref AS_X on (S.sid = AS_X.sid) "; 
-			  query += "inner join Albums A on (AS_X.aid = A.aid) ";
-			  query += "inner join SongGenres_Xref SG_X on (S.sid = SG_X.sid) "; 
-			  query += "inner join Genres G on (SG_X.gid = G.gid) ";
-			  query += "inner join Bands B on (A.band = B.bid) ";
+       String query = "select S.name as \"Title\""; 
+			  query += ", S.duration as \"Duration\""; 
+			  query += ", S.release_date as \"Release Date\""; 
+			  query += ", B.name as \"Band\""; 
+			  query += ", A.name as \"Album\""; 
+			  query += ", G.name as \"Genre\""; 
+			  query += " from Songs S";
+			  query += " inner join AlbumsSongs_Xref AS_X on (S.sid = AS_X.sid)"; 
+			  query += " inner join Albums A on (AS_X.aid = A.aid)";
+			  query += " inner join SongGenres_Xref SG_X on (S.sid = SG_X.sid)"; 
+			  query += " inner join Genres G on (SG_X.gid = G.gid)";
+			  query += " inner join Bands B on (A.band = B.bid)";
+           //COALESCE returns first of its arguments that isn't null.
+           //Here, we use it to say, if there isn't an argument,
+           //don't constrain the search (e.g. S.name will always equal S.name)
+           query += " where (S.name = coalesce(?, S.name))";
+           query += "  and (B.name = coalesce(?, B.name))";
+           query += "  and (A.name = coalesce(?, A.name))";
+           query += "  and (G.name = coalesce(?, G.name))";
            query += ";";
-//We need an injection-safe way to handle this:
-/*
-		if (title != null)
-			query += "and S.name = " + title;
-		if (band != null)
-			query += "and B.name = " + band;
-		if (album != null)
-			query += "and A.name = " + album;
-		if (genre != null)
-			query += "and G.name = " + genre;
-*/
       
-        Statement st = _DB.createStatement();
-        ResultSet rs = st.executeQuery(query);
+        //This is how we'll handle being safe from SQL injection
+        // the set___ functions take the first number as the number of the
+        // question mark, in order of appearence, to replace.
+        // 1 means 1st question mark, 2 means 2nd, and so on.
+        // the second argument is what to replace the question mark by.
+        PreparedStatement preparedStatement = _DB.prepareStatement(query);
+        preparedStatement.setString(1,arg_title);
+        preparedStatement.setString(2,arg_band);
+        preparedStatement.setString(3,arg_album);
+        preparedStatement.setString(4,arg_genre);
+        ResultSet rs = preparedStatement.executeQuery();
+
         
         while (rs.next()) {
 			String title = rs.getString("Title");
@@ -74,7 +82,7 @@ public class SongListServlet extends HttpServlet {
         }
         
         rs.close();
-        st.close();
+        preparedStatement.close();
 
         return songlist;
    
