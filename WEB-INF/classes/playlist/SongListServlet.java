@@ -2,6 +2,7 @@ package playlist;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.sql.SQLException;
@@ -45,6 +46,7 @@ public class SongListServlet extends HttpServlet {
 			  query += "inner join Genres G on (SG_X.gid = G.gid) ";
 			  query += "inner join Bands B on (A.band = B.bid) ";
            query += ";";
+//We need an injection-safe way to handle this:
 /*
 		if (title != null)
 			query += "and S.name = " + title;
@@ -74,47 +76,45 @@ public class SongListServlet extends HttpServlet {
         rs.close();
         st.close();
 
-    return songlist;
+        return songlist;
    
     }
 
-    public void printSongList(PrintWriter out) {
-
-	//out.println("<h1>Song List </h1>");
-	//out.println("<table>");
-	
-	try {
-	    ArrayList<Song> songlist = getSongList(null,null,null,null);
-       Gson gson = new Gson();
-       gson.toJson(songlist,out);	    
-       /*for (int i=0; i<songlist.size(); i++) {
-		Song song = (Song) songlist.get(i);
-		//out.println(song.toJSON());//HTML());
-	    }
-      */
-	} catch (SQLException sqle) {
-	    sqle.printStackTrace(out);
-	}
-	
-    }
-
-    public void doGet(HttpServletRequest request, HttpServletResponse response) 
-	throws ServletException, IOException {
+   public void doGet(HttpServletRequest request, HttpServletResponse response) 
+      throws ServletException, IOException {
   
-	response.setContentType("text/html");
-	PrintWriter out = response.getWriter();
-
-	//out.println("<html><head></head><body>");
+	   response.setContentType("text/html");
+      PrintWriter out = response.getWriter();
       
-	if (!_message.startsWith("Servus")) {
-       out.println("<h1>Databaase connection failed to open " + _message + "</h1>");
-	} else {    
-	    printSongList(out);
-	}
-	  
-	//out.println("</table>");
-	//out.println("</html>");
-    }
+      //Query Strings are of the form arg=val&arg2=val2&arg3=val3
+      //they show up at the end of the url like: <url>?<query-string>
+      //you can get parameters with the functions below
+      //if I request http://resin.cci.drexel.edu/songlist?title=abc
+      //title will have the value "abc" and the rest will be null
+      //out.println(request.getQueryString());
+      String title = request.getParameter("title");
+      String band = request.getParameter("band");
+      String album = request.getParameter("album");
+      String genre = request.getParameter("genre");
+
+ 
+	   if (!_message.startsWith("Servus")) {
+         JsonResponse jsonResponse = new JsonResponse("ERROR",_message);
+         response.getWriter().println(jsonResponse.toJson());
+	   } else {    
+         try {
+	         ArrayList<Song> songlist = getSongList(title,band,album,genre);
+            Gson gson = new Gson();
+            JsonResponse jsonResponse = new JsonResponse("OK",gson.toJson(songlist));
+            response.getWriter().println(jsonResponse.toJson());
+	      } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            JsonResponse jsonResponse = new JsonResponse("ERROR",sw.toString());
+         }
+      }
+   }
   
     public void doPost(HttpServletRequest inRequest, HttpServletResponse outResponse) 
 	throws ServletException, IOException {  
