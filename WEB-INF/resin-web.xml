@@ -20,6 +20,50 @@
 	  <url-pattern>/songlist</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>PlaylistDisplayServlet</servlet-name>
+    <servlet-class>playlist.PlaylistDisplayServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+	  <servlet-name>PlaylistDisplayServlet</servlet-name>
+	  <url-pattern>/playlistdisplay</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>PlaylistInsertServlet</servlet-name>
+    <servlet-class>playlist.PlaylistInsertServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+	  <servlet-name>PlaylistInsertServlet</servlet-name>
+	  <url-pattern>/playlistinsert</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>PlaylistRemoveServlet</servlet-name>
+    <servlet-class>playlist.PlaylistRemoveServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+	  <servlet-name>PlaylistRemoveServlet</servlet-name>
+	  <url-pattern>/playlistremove</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>PlaylistCreateServlet</servlet-name>
+    <servlet-class>playlist.PlaylistCreateServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+	  <servlet-name>PlaylistCreateServlet</servlet-name>
+	  <url-pattern>/playlistcreate</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>PlaylistDeleteServlet</servlet-name>
+    <servlet-class>playlist.PlaylistDeleteServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+	  <servlet-name>PlaylistDeleteServlet</servlet-name>
+	  <url-pattern>/playlistdelete</url-pattern>
+  </servlet-mapping>
 
   <servlet>
     <servlet-name>hello</servlet-name>
