@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -41,12 +42,23 @@ public class PlaylistRemoveServlet extends HttpServlet {
 
         PreparedStatement preparedStatement = _DB.prepareStatement(query);
 		ResultSet rs = preparedStatement.executeQuery();
-    	String result = rs.getString(1);
+    	String result1 = rs.getString(1);
         
-        rs.close();
+     	Date today = (Date) Calendar.getInstance().getTime();
+    	
+        String query2 = "update Playlists P set modified = "; 
+ 		  	   query2 += today; 
+ 		       query2 += " where P.name = " + arg_playlist; 
+ 	           query2 += ";";
+
+        preparedStatement = _DB.prepareStatement(query2);
+ 		rs = preparedStatement.executeQuery();
+     	String result2 = rs.getString(1);
+
+    	rs.close();
         preparedStatement.close();
 
-        return result;
+        return result2;
    
     }
 

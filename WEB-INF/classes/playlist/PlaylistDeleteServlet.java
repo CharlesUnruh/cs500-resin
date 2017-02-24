@@ -1,19 +1,19 @@
 package playlist;
-import com.google.gson.Gson;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Calendar;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.google.gson.Gson;
 
 /**
  * 
@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Charles Unruh (ceu24@cs.drexel.edu)
  *
  */
-public class PlaylistInsertServlet extends HttpServlet {
+public class PlaylistDeleteServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private DBManager _DB;
@@ -32,29 +32,25 @@ public class PlaylistInsertServlet extends HttpServlet {
 	_message = _DB.openDBConnection("PgBundle");
     }
 
-    public String addToPlaylist(String arg_username, String arg_playlist, String arg_song) throws SQLException {
-     
-       String query = "insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values ("; 
-		  	  query += "(select uid from Users U where U.username = " + arg_username + "),"; 
-		      query += "(select pid from Playlists P where P.name = " + arg_playlist + "),"; 
-		      query += "(select sid from Songs S where S.name = " + arg_song + "),"; 
-	          query += ";";
+    public String deletePlaylist(String arg_username, String arg_playlist) throws SQLException {
+         	
+        String query = "delete from UsersPlaylistsSongs_Xref UPS_X"; 
+ 		  	  query += "where UPS_X.uid = (select uid from Users U where U.username = " + arg_username + ")"; 
+ 		      query += "and UPS_X.pid = (select pid from Playlists P where P.name = " + arg_playlist + ")"; 
+ 	          query += ";";
 
         PreparedStatement preparedStatement = _DB.prepareStatement(query);
-		ResultSet rs = preparedStatement.executeQuery();
-    	String result1 = rs.getString(1);
-    	
-     	Date today = (Date) Calendar.getInstance().getTime();
-    	
-        String query2 = "update Playlists P set modified = "; 
- 		  	   query2 += today; 
- 		       query2 += " where P.name = " + arg_playlist; 
- 	           query2 += ";";
+ 		ResultSet rs = preparedStatement.executeQuery();
+     	String result1 = rs.getString(1);
+     	
+        String query2 = "delete from Playlists P "; 
+ 		      query2 += "where P.name = " + arg_playlist + ")"; 
+ 	          query2 += ";";
 
-        preparedStatement = _DB.prepareStatement(query);
+        preparedStatement = _DB.prepareStatement(query2);
  		rs = preparedStatement.executeQuery();
      	String result2 = rs.getString(1);
-
+     	
 		rs.close();
         preparedStatement.close();
 
@@ -76,7 +72,6 @@ public class PlaylistInsertServlet extends HttpServlet {
       //out.println(request.getQueryString());
       String username = request.getParameter("username");
       String playlist = request.getParameter("playlist");
-      String song = request.getParameter("song");
 
 
  
@@ -85,7 +80,7 @@ public class PlaylistInsertServlet extends HttpServlet {
          response.getWriter().println(jsonResponse.toJson());
 	   } else {    
          try {
-	        String result = addToPlaylist(username, playlist, song);
+	        String result = deletePlaylist(username, playlist);
             Gson gson = new Gson();
             JsonResponse jsonResponse = new JsonResponse("OK",gson.toJson(result));
             response.getWriter().println(jsonResponse.toJson());
