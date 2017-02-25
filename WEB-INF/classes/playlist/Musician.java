@@ -16,6 +16,7 @@ public class Musician {
   private Date dob;
   private String band;
   private String album;
+  private String song;
 
   /**
    * Constructor
@@ -23,11 +24,12 @@ public class Musician {
    * @param name
    * @param gpa
    */
-  public Musician(String name, Date dob, String band, String album) {
+  public Musician(String name, Date dob, String band, String album, String song) {
     this.name = name;
     this.dob = dob;
     this.band = band;
     this.album = album;
+    this.song = song;
   }
   
   public String toJson() {
