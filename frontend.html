@@ -1,20 +1,58 @@
 <!DOCTYPE html>
 <html>
-<body>
+<body onload="init();">
 <p>
-Click the button
+Playlist Demo Frontend
 </p>
+<p id="DEBUG"></p>
 
-<button id="SongListButton" >clickme</button>
-<p id="SongList"></p>
+<div id="SongRequestDiv">
+<form id="SongListForm">
+Song Title:
+<input type="text" id="SongListInputTitle">
+Exact Match:
+<input type="checkbox" name="exacttitle" value="true" id="SongListMatchTitle">
+<br>
+Album Name:
+<input type="text" id="SongListInputAlbum">
+Exact Match:
+<input type="checkbox" name="exactalbum" value="true" id="SongListMatchAlbum">
+<br>
+Band Name:
+<input type="text" id="SongListInputBand">
+Exact Match:
+<input type="checkbox" name="exacttitle" value="true" id="SongListMatchBand">
+<br>
+Genre:
+<input type="text" id="SongListInputGenre">
+Exact Match:
+<input type="checkbox" name="exacttitle" value="true" id="SongListMatchGenre">
+<br>
+<input type="button" value="Submit" id="SongListFormSubmit">
+</form>
+<p id="SongListReturn"></p>
+</div>
 <script>
-var btn_SongListRequest = document.getElementById("SongListButton");
-btn_SongListRequest.addEventListener('click', getSongList, false);
+function init()
+{
+   var btn_SongListRequest = document.getElementById("SongListFormSubmit");
+   btn_SongListRequest.addEventListener('click', getSongList, false);
+}
 
 function getSongList()
 {
    var xhr = new XMLHttpRequest();
-   xhr.open('GET', "http://resin.cci.drexel.edu:8080/~ceu24/songlist", true);
+   var request = "http://resin.cci.drexel.edu:8080/~ceu24/songlist?&";
+   var val = document.getElementById("SongListInputTitle").value;
+   if (val != "") { request += "title=" + val + "&"; }
+   val = document.getElementById("SongListInputAlbum").value;
+   if (val != "") { request += "album=" + val + "&"; }
+   val = document.getElementById("SongListInputBand").value;
+   if (val != "") { request += "band=" + val + "&"; }
+   val = document.getElementById("SongListInputGenre").value;
+   if (val != "") { request += "genre=" + val + "&"; }
+
+   xhr.open('GET', request, true);
    xhr.onreadystatechange = function () {handleSongListRequest(xhr);} ;
    xhr.send();
 }
@@ -23,7 +61,7 @@ function handleSongListRequest(xhr) {
    if (xhr.readyState == 4 && xhr.status == 200){
       var response = JSON.parse(xhr.responseText);
       var data = JSON.parse(response.data);
-      var table = "<table><tr><td>Title</td><td>Duration</td><td>Album</td><td>Band</td><td>Release Date</td><td>genre</td></tr>";
+      var table = "<table><tr><td>Title</td><td>Duration</td><td>Album</td><td>Band</td><td>Release Date</td><td>Genre</td></tr>";
       for (var i=0; i < data.length; i++) {
          table += "<tr>";
          table += "<td>" + data[i].title + "</td>";
@@ -34,8 +72,14 @@ function handleSongListRequest(xhr) {
          table += "<td>" + data[i].genre + "</td>";
          table += "</tr>";
       }
+      table = "<table><tr><td>Title</td><td>Duration</td><td>Album</td><td>Band</td><td>Release Date</td><td>Genre</td></tr>" + table;
       table += "</table>"
-      document.getElementById("SongList").innerHTML = table;
+      if ( data.length == 0 )
+      {
+         table = "";
+      }
+      table = "<p>We found " + data.length + " songs matching your search!</p>" + table;
+      document.getElementById("SongListReturn").innerHTML = table;
    }
 }
 </script>

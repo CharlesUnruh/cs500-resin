@@ -31,9 +31,18 @@ public class SongListServlet extends HttpServlet {
 	_message = _DB.openDBConnection("PgBundle");
     }
 
-    public ArrayList<Song> getSongList(String arg_title, String arg_band, String arg_album, String arg_genre) throws SQLException {
+    public ArrayList<Song> getSongList(HttpServletRequest request) throws SQLException {
      
        ArrayList<Song> songlist = new ArrayList<Song>();
+       
+       String arg_title = request.getParameter("title");
+       String arg_band = request.getParameter("band");
+       String arg_album = request.getParameter("album");
+       String arg_genre = request.getParameter("genre");
+       String exacttitle = request.getParameter("exacttitle");
+       String exactband = request.getParameter("exactband");
+       String exactalbum = request.getParameter("exactalbum");
+       String exactgenre = request.getParameter("exactgenre");
        
        String query = "select S.name as \"Title\""; 
 			  query += ", S.duration as \"Duration\""; 
@@ -50,10 +59,26 @@ public class SongListServlet extends HttpServlet {
            //COALESCE returns first of its arguments that isn't null.
            //Here, we use it to say, if there isn't an argument,
            //don't constrain the search (e.g. S.name will always equal S.name)
-           query += " where (S.name = coalesce(?, S.name))";
-           query += "  and (B.name = coalesce(?, B.name))";
-           query += "  and (A.name = coalesce(?, A.name))";
-           query += "  and (G.name = coalesce(?, G.name))";
+           if (exacttitle != null) {
+            query += " where (S.name = coalesce(?, S.name))";
+           } else {
+            query += " where (S.name like '%'||coalesce(?, S.name)||'%')";
+           }
+           if (exactband != null) {
+            query += "  and (B.name = coalesce(?, B.name))";
+           } else {
+            query += " and (B.name like '%'||coalesce(?, B.name)||'%')";
+           }
+           if (exactalbum != null) {
+            query += "  and (A.name = coalesce(?, A.name))";
+           } else {
+            query += " and (A.name like '%'||coalesce(?, A.name)||'%')";
+           }
+           if (exactgenre != null) {
+            query += "  and (G.name = coalesce(?, G.name))";
+           } else {
+            query += " and (G.name like '%'||coalesce(?, G.name)||'%')";
+           }
            query += ";";
       
         //This is how we'll handle being safe from SQL injection
@@ -100,18 +125,14 @@ public class SongListServlet extends HttpServlet {
       //if I request http://resin.cci.drexel.edu/songlist?title=abc
       //title will have the value "abc" and the rest will be null
       //out.println(request.getQueryString());
-      String title = request.getParameter("title");
-      String band = request.getParameter("band");
-      String album = request.getParameter("album");
-      String genre = request.getParameter("genre");
-
+      
  
 	   if (!_message.startsWith("Servus")) {
          JsonResponse jsonResponse = new JsonResponse("ERROR",_message);
          response.getWriter().println(jsonResponse.toJson());
 	   } else {    
          try {
-	         ArrayList<Song> songlist = getSongList(title,band,album,genre);
+	         ArrayList<Song> songlist = getSongList(request);
             Gson gson = new Gson();
             JsonResponse jsonResponse = new JsonResponse("OK",gson.toJson(songlist));
             response.getWriter().println(jsonResponse.toJson());
