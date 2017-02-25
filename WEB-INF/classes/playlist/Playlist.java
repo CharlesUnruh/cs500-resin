@@ -16,6 +16,7 @@ public class Playlist {
   private String username;
   private Date createdDate;
   private Date modifiedDate;
+  private Date releaseDate;
   private String song;
   private String album;
   private String band;
@@ -34,7 +35,7 @@ public class Playlist {
    * @param genre
    * @param duration
    */
-  public Playlist(String name, String username, Date createdDate, Date modifiedDate, String song, String album, String band, String genre, int duration) {
+  public Playlist(String name, String username, Date createdDate, Date modifiedDate, String song, String album, String band, String genre, int duration, Date releaseDate) {
 	    this.name = name;
 	    this.username = username;
 	    this.createdDate = createdDate;
@@ -44,6 +45,7 @@ public class Playlist {
 	    this.band = band;
 	    this.genre = genre;
        this.duration = duration;
+       this.releaseDate = releaseDate;
   }
   
   public String toJson() {

@@ -48,6 +48,7 @@ public class PlaylistDisplayServlet extends HttpServlet {
 			  query += ", B.name as \"Band\""; 
 			  query += ", G.name as \"Genre\""; 
            query += ", S.duration as \"Duration\"";
+           query += ", S.release_date as \"Release Date\"";
 			  query += " from Playlists PL";
 			  query += " inner join UsersPlaylistsSongs_Xref UPS_X on (PL.pid = UPS_X.pid)"; 
 			  query += " inner join Users U on (UPS_X.uid = U.uid)"; 
@@ -80,12 +81,13 @@ public class PlaylistDisplayServlet extends HttpServlet {
 			String username = rs.getString("User");
 			Date createdDate = rs.getDate("Created"); 
 			Date modifiedDate = rs.getDate("Modified"); 
+         Date releaseDate = rs.getDate("Release Date");
 			String song = rs.getString("Song");
 			String band = rs.getString("Band");
 			String album = rs.getString("Album");
 			String genre = rs.getString("Genre");
          int duration = rs.getInt("Duration");
-			Playlist playlist = new Playlist(name, username, createdDate, modifiedDate, song, band, album, genre, duration);
+			Playlist playlist = new Playlist(name, username, createdDate, modifiedDate, song, album, band, genre, duration, releaseDate);
            
 			playlistlist.add(playlist);
         }
