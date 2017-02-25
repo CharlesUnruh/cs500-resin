@@ -35,6 +35,10 @@ public class PlaylistDisplayServlet extends HttpServlet {
      
        ArrayList<Playlist> playlistlist = new ArrayList<Playlist>();
        
+       String arg_username = request.getParameter("username");
+       String arg_playlistName = request.getParameter("playlistname");
+       String exactPlaylistName = request.getParameter("exactplaylistname");      
+
        String query = "select PL.name as \"Name\""; 
 			  query += ", U.username as \"User\""; 
 			  query += ", PL.created as \"Created\""; 
@@ -53,7 +57,13 @@ public class PlaylistDisplayServlet extends HttpServlet {
 			  query += " inner join SongGenres_Xref SG_X on (S.sid = SG_X.sid)"; 
 			  query += " inner join Genres G on (SG_X.gid = G.gid)";
 			  query += " inner join Bands B on (A.band = B.bid)";
-	          query += ";";
+	        query += " where (U.username = ?)";
+           if (exactPlaylistName != null) {
+              query += " and (PL.name = coalesce(?, PL.name))";
+           } else {
+              query += " and (PL.name like '%'||coalesce(?, PL.name)||'%')";
+           }
+           query += ";";
 
         //This is how we'll handle being safe from SQL injection
         // the set___ functions take the first number as the number of the
@@ -61,7 +71,9 @@ public class PlaylistDisplayServlet extends HttpServlet {
         // 1 means 1st question mark, 2 means 2nd, and so on.
         // the second argument is what to replace the question mark by.
         PreparedStatement preparedStatement = _DB.prepareStatement(query);
-		ResultSet rs = preparedStatement.executeQuery();
+		  preparedStatement.setString(1,arg_username);
+        preparedStatement.setString(2,arg_playlistName);
+        ResultSet rs = preparedStatement.executeQuery();
         
         while (rs.next()) {
 			String name = rs.getString("Name");
