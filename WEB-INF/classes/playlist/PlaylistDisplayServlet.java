@@ -31,7 +31,7 @@ public class PlaylistDisplayServlet extends HttpServlet {
 	_message = _DB.openDBConnection("PgBundle");
     }
 
-    public ArrayList<Playlist> getPlaylist() throws SQLException {
+    public ArrayList<Playlist> getPlaylist(HttpServletRequest request) throws SQLException {
      
        ArrayList<Playlist> playlistlist = new ArrayList<Playlist>();
        
@@ -43,6 +43,7 @@ public class PlaylistDisplayServlet extends HttpServlet {
 			  query += ", A.name as \"Album\""; 
 			  query += ", B.name as \"Band\""; 
 			  query += ", G.name as \"Genre\""; 
+           query += ", S.duration as \"Duration\"";
 			  query += " from Playlists PL";
 			  query += " inner join UsersPlaylistsSongs_Xref UPS_X on (PL.pid = UPS_X.pid)"; 
 			  query += " inner join Users U on (UPS_X.uid = U.uid)"; 
@@ -71,7 +72,8 @@ public class PlaylistDisplayServlet extends HttpServlet {
 			String band = rs.getString("Band");
 			String album = rs.getString("Album");
 			String genre = rs.getString("Genre");
-			Playlist playlist = new Playlist(name, username, createdDate, modifiedDate, song, band, album, genre);
+         int duration = rs.getInt("Duration");
+			Playlist playlist = new Playlist(name, username, createdDate, modifiedDate, song, band, album, genre, duration);
            
 			playlistlist.add(playlist);
         }
@@ -106,7 +108,7 @@ public class PlaylistDisplayServlet extends HttpServlet {
          response.getWriter().println(jsonResponse.toJson());
 	   } else {    
          try {
-	         ArrayList<Playlist> playlist = getPlaylist();
+	         ArrayList<Playlist> playlist = getPlaylist(request);
             Gson gson = new Gson();
             JsonResponse jsonResponse = new JsonResponse("OK",gson.toJson(playlist));
             response.getWriter().println(jsonResponse.toJson());

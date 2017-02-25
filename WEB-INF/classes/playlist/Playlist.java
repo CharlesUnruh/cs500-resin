@@ -20,6 +20,7 @@ public class Playlist {
   private String album;
   private String band;
   private String genre;
+  private int duration;
 
   /**
    * Constructor
@@ -31,8 +32,9 @@ public class Playlist {
    * @param album
    * @param band
    * @param genre
+   * @param duration
    */
-  public Playlist(String name, String username, Date createdDate, Date modifiedDate, String song, String album, String band, String genre) {
+  public Playlist(String name, String username, Date createdDate, Date modifiedDate, String song, String album, String band, String genre, int duration) {
 	    this.name = name;
 	    this.username = username;
 	    this.createdDate = createdDate;
@@ -41,6 +43,7 @@ public class Playlist {
 	    this.album = album;
 	    this.band = band;
 	    this.genre = genre;
+       this.duration = duration;
   }
   
   public String toJson() {
