@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<body>
+<p>
+Click the button
+</p>
+
+<button id="SongListButton" >clickme</button>
+<p id="SongList"></p>
+<script>
+var btn_SongListRequest = document.getElementById("SongListButton");
+btn_SongListRequest.addEventListener('click', getSongList, false);
+
+function getSongList()
+{
+   var xhr = new XMLHttpRequest();
+   xhr.open('GET', "http://resin.cci.drexel.edu:8080/~ceu24/songlist", true);
+   xhr.onreadystatechange = function () {handleSongListRequest(xhr);} ;
+   xhr.send();
+}
+
+function handleSongListRequest(xhr) {
+   if (xhr.readyState == 4 && xhr.status == 200){
+      var response = JSON.parse(xhr.responseText);
+      var data = JSON.parse(response.data);
+      var table = "<table><tr><td>Title</td><td>Duration</td><td>Album</td><td>Band</td><td>Release Date</td><td>genre</td></tr>";
+      for (var i=0; i < data.length; i++) {
+         table += "<tr>";
+         table += "<td>" + data[i].title + "</td>";
+         table += "<td>" + data[i].duration + "</td>";
+         table += "<td>" + data[i].album + "</td>";
+         table += "<td>" + data[i].band + "</td>";
+         table += "<td>" + data[i].releaseDate + "</td>";
+         table += "<td>" + data[i].genre + "</td>";
+         table += "</tr>";
+      }
+      table += "</table>"
+      document.getElementById("SongList").innerHTML = table;
+   }
+}
+</script>
+</body>
+</html>

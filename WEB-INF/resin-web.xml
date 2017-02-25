@@ -21,6 +21,15 @@
   </servlet-mapping>
 
   <servlet>
+    <servlet-name>FrontendServlet</servlet-name>
+    <servlet-class>playlist.Frontend</servlet-class>
+  </servlet>
+  <servlet-mapping>
+	  <servlet-name>FrontendServlet</servlet-name>
+	  <url-pattern>/frontend</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
     <servlet-name>PlaylistDisplayServlet</servlet-name>
     <servlet-class>playlist.PlaylistDisplayServlet</servlet-class>
   </servlet>
