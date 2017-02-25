@@ -818,6 +818,7 @@ create table Playlists (
 
 insert into Playlists (name, created, modified) values ('Marc''s Rock', '2017-02-01', '2017-02-02');
 insert into Playlists (name, created, modified) values ('Charle''s Music', '2017-02-25', '2017-02-25');
+insert into Playlists (name, created, modified) values ('Charle''s Rock', '2017-02-25', '2017-02-25');
 
 create table UsersPlaylistsSongs_Xref (
        uid		bigint		not null,
@@ -857,4 +858,18 @@ insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 2, 79);
 insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 2, 82);
 insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 2, 83);
 insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 2, 86);
-
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 3, 3);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 3, 8);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 3, 11);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 3, 13);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 3, 16);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 3, 20);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 3, 22);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 3, 29);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 3, 32);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 3, 38);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 3, 40);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 3, 42);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 3, 46);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 3, 47);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 3, 51);
