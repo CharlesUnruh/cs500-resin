@@ -7,37 +7,56 @@ Playlist Demo Frontend
 <p id="DEBUG"></p>
 
 <div id="SongRequestDiv">
-<p id="SongListTitle">Query Song Database</p>
-<form id="SongListForm">
-Song Title:
-<input type="text" id="SongListInputTitle">
-Exact Match:
-<input type="checkbox" name="exacttitle" value="true" id="SongListMatchTitle">
-<br>
-Album Name:
-<input type="text" id="SongListInputAlbum">
-Exact Match:
-<input type="checkbox" name="exactalbum" value="true" id="SongListMatchAlbum">
-<br>
-Band Name:
-<input type="text" id="SongListInputBand">
-Exact Match:
-<input type="checkbox" name="exacttitle" value="true" id="SongListMatchBand">
-<br>
-Genre:
-<input type="text" id="SongListInputGenre">
-Exact Match:
-<input type="checkbox" name="exacttitle" value="true" id="SongListMatchGenre">
-<br>
-<input type="button" value="Submit" id="SongListFormSubmit">
-</form>
-<p id="SongListReturn"></p>
+   <p id="SongListTitle">Query Song Database</p>
+   <form id="SongListForm">
+      Song Title:
+      <input type="text" id="SongListInputTitle">
+      Exact Match:
+      <input type="checkbox" name="exacttitle" value="true" id="SongListMatchTitle">
+      <br>
+      Album Name:
+      <input type="text" id="SongListInputAlbum">
+      Exact Match:
+      <input type="checkbox" name="exactalbum" value="true" id="SongListMatchAlbum">
+      <br>
+      Band Name:
+      <input type="text" id="SongListInputBand">
+      Exact Match:
+      <input type="checkbox" name="exactband" value="true" id="SongListMatchBand">
+      <br>
+      Genre:
+      <input type="text" id="SongListInputGenre">
+      Exact Match:
+      <input type="checkbox" name="exacttitle" value="true" id="SongListMatchGenre">
+      <br>
+      <input type="button" value="Submit" id="SongListFormSubmit">
+   </form>
+   <p id="SongListReturn"></p>
 </div>
+
+<div id="PlaylistRequestDiv">
+   <p id="PlaylistRequestTitle">Get Playlist</p>
+   <form id="PlaylistRequestForm">
+      Username:
+      <input type="text" id="PlaylistRequestUsername">
+      <br>
+      Playlist Name:
+      <input type="text" id="PlaylistRequestPlaylistName">
+      Exact Match:
+      <input type="checkbox" name="exactplaylistname" value=true id="PlaylistRequestMatchPlaylistName">
+      <br>
+      <input type="button" value="Submit" id="PlaylistRequestFormSubmit">
+   </form>
+   <p id="PlaylistRequestReturn"></p>
+</div>
+
 <script>
 function init()
 {
    var btn_SongListRequest = document.getElementById("SongListFormSubmit");
    btn_SongListRequest.addEventListener('click', getSongList, false);
+   var btn_PlaylistRequest = document.getElementById("PlaylistRequestFormSubmit");
+   btn_PlaylistRequest.addEventListener('click', getPlaylist, false);
 }
 
 function getSongList()
@@ -52,9 +71,43 @@ function getSongList()
    if (val != "") { request += "band=" + val + "&"; }
    val = document.getElementById("SongListInputGenre").value;
    if (val != "") { request += "genre=" + val + "&"; }
+   
+   if (document.getElementById("SongListMatchTitle").checked){ 
+      request += "exacttitle=true" + "&";
+   }
+   if (document.getElementById("SongListMatchBand").checked){ 
+      request += "exactband=true" + "&";
+   }
+   if (document.getElementById("SongListMatchAlbum").checked){ 
+      request += "exactalbum=true" + "&";
+   }
+   if (document.getElementById("SongListMatchGenre").checked){ 
+      request += "exactgenre=true" + "&";
+   }
 
    xhr.open('GET', request, true);
    xhr.onreadystatechange = function () {handleSongListRequest(xhr);} ;
+   xhr.send();
+}
+
+function getPlaylist()
+{
+   var xhr = new XMLHttpRequest();
+   var request = "http://resin.cci.drexel.edu:8080/~ceu24/playlistdisplay?&";
+   var val = document.getElementById("PlaylistRequestUsername").value;
+   if (val != "") { request += "username=" + val + "&"; }
+   else { 
+      document.getElementById("PlaylistRequestReturn").innerHTML = "Please supply a user to get their associated playlist(s).";
+      return;
+   }
+   val = document.getElementById("PlaylistRequestPlaylistName").value;
+   if (val != "") { request += "playlistname=" + val + "&"; }
+   if (document.getElementById("PlaylistRequestMatchPlaylistName").checked){ 
+      request += "exactplaylistname=true" + "&";
+   }
+
+   xhr.open('GET', request, true);
+   xhr.onreadystatechange = function () {handlePlaylistRequest(xhr);} ;
    xhr.send();
 }
 
@@ -81,6 +134,45 @@ function handleSongListRequest(xhr) {
       }
       table = "<p>We found " + data.length + " songs matching your search!</p>" + table;
       document.getElementById("SongListReturn").innerHTML = table;
+   }
+}
+
+function handlePlaylistRequest(xhr) {
+   if (xhr.readyState == 4 && xhr.status == 200){
+      var response = JSON.parse(xhr.responseText);
+      var data = JSON.parse(response.data);
+
+ //     var output = "<p>We found " + data.length + " songs matching your search!</p>";
+      var output = "";
+
+      if (data.length == 0) {
+         document.getElementById("PlaylistRequestReturn").innerHTML = output;
+         return;
+      }
+      var username = data[0].username;
+      var current_playlist = data[0].name;
+      output += "<h3>" + username + "'s \"" + current_playlist + "\" Playlist!</h3>";
+      output += "<p>Created on (" + data[0].createdDate + ") and last modified on (" + data[0].modifiedDate + ")</p>";
+      output += "<table><tr><td>Title</td><td>Duration</td><td>Album</td><td>Band</td><td>Release Date</td><td>Genre</td></tr>";
+      for ( var i=0; i < data.length; i++){
+/*         if (current_playlist != data[i].name){
+            current_playlist = data[i].name;
+            output += "</table>";
+            output += "<h3>" + username + "'s \"" + current_playlist + "\" Playlist!</h3>";
+            output += "<p>Created on (" + data[i].createdDate + ") and last modified on (" + data[i].modifiedDate + "</p>";
+            output += "<table><tr><td>Title</td><td>Duration</td><td>Album</td><td>Band</td><td>Release Date</td><td>Genre</td></tr>";
+         }*/
+         output += "<tr>";
+         output += "<td>" + data[i].song + "</td>";
+         output += "<td>" + data[i].duration + "</td>";
+         output += "<td>" + data[i].album + "</td>";
+         output += "<td>" + data[i].band + "</td>";
+         output += "<td>" + data[i].releaseDate + "</td>";
+         output += "<td>" + data[i].genre + "</td>";
+         output += "</tr>";
+      }
+      output += "</table>";
+      document.getElementById("PlaylistRequestReturn").innerHTML = output;
    }
 }
 </script>
