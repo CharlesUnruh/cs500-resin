@@ -31,14 +31,27 @@ public class MusicianListServlet extends HttpServlet {
 	_message = _DB.openDBConnection("PgBundle");
     }
 
-    public ArrayList<Musician> getMusicianList() throws SQLException {
+    public ArrayList<Musician> getMusicianList(HttpServletRequest request) throws SQLException {
      
        ArrayList<Musician> musicianlist = new ArrayList<Musician>();
        
+       String arg_name = request.getParameter("name");
+       String exactname = request.getParameter("exactname");
+       String exactband = request.getParameter("exactband");
+       String exactalbum = request.getParameter("exactalbum");
+       String exactsong = request.getParameter("exactsong");
+
        String query = "select distinct M.name as \"Name\""; 
 			  query += ", M.dob as \"DOB\""; 
-			  query += ", A.name as \"Album\""; 
-			  query += ", B.name as \"Band\""; 
+			  if (exactband != null) {
+				  query += ", B.name as \"Band\""; 
+			  }
+			  if (exactalbum != null) {
+				  query += ", A.name as \"Album\"";
+			  }
+			  if (exactsong != null) {
+				  query += ", S.name as \"Song\"";
+			  }
 			  query += " from Musicians M";
 			  query += " inner join BandsMusicians_Xref BM_X on (M.mid = BM_X.mid)"; 
 			  query += " inner join Bands B on (BM_X.bid = B.bid)";
@@ -47,7 +60,15 @@ public class MusicianListServlet extends HttpServlet {
 			  query += " inner join AlbumsSongs_Xref AS_X on (S.sid = AS_X.sid)";
 			  query += " inner join Albums A on (AS_X.aid = A.aid)";
 			  query += " order by B.name, M.dob";
-           query += ";";
+	           //COALESCE returns first of its arguments that isn't null.
+	           //Here, we use it to say, if there isn't an argument,
+	           //don't constrain the search (e.g. M.name will always equal M.name)
+			  if (exactname != null) {
+	               query += " where (M.name = coalesce(?, M.name))";
+	           } else {
+	               query += " where (M.name like '%'||coalesce(?, M.name)||'%')";
+	           }
+			  query += ";";
       
         //This is how we'll handle being safe from SQL injection
         // the set___ functions take the first number as the number of the
@@ -55,6 +76,7 @@ public class MusicianListServlet extends HttpServlet {
         // 1 means 1st question mark, 2 means 2nd, and so on.
         // the second argument is what to replace the question mark by.
         PreparedStatement preparedStatement = _DB.prepareStatement(query);
+        preparedStatement.setString(1,arg_name);
         ResultSet rs = preparedStatement.executeQuery();
 
         
@@ -63,7 +85,8 @@ public class MusicianListServlet extends HttpServlet {
 			Date dob = rs.getDate("DOB"); 
 			String band = rs.getString("Band");
 			String album = rs.getString("Album");
-			Musician musician = new Musician(name, dob, band, album);
+			String song = rs.getString("Song");
+			Musician musician = new Musician(name, dob, band, album, song);
            
 			musicianlist.add(musician);
         }
@@ -78,16 +101,23 @@ public class MusicianListServlet extends HttpServlet {
    public void doGet(HttpServletRequest request, HttpServletResponse response) 
       throws ServletException, IOException {
   
-	   response.setContentType("text/html");
+	  response.setContentType("application/json");
       PrintWriter out = response.getWriter();
       
- 
+      //Query Strings are of the form arg=val&arg2=val2&arg3=val3
+      //they show up at the end of the url like: <url>?<query-string>
+      //you can get parameters with the functions below
+      //if I request http://resin.cci.drexel.edu/songlist?title=abc
+      //title will have the value "abc" and the rest will be null
+      //out.println(request.getQueryString());
+      
+      
 	   if (!_message.startsWith("Servus")) {
          JsonResponse jsonResponse = new JsonResponse("ERROR",_message);
          response.getWriter().println(jsonResponse.toJson());
 	   } else {    
          try {
-        	 ArrayList<Musician> musicianlist = getMusicianList();
+        	 ArrayList<Musician> musicianlist = getMusicianList(request);
             Gson gson = new Gson();
             JsonResponse jsonResponse = new JsonResponse("OK",gson.toJson(musicianlist));
             response.getWriter().println(jsonResponse.toJson());
