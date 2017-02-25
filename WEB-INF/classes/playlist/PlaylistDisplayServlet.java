@@ -86,7 +86,7 @@ public class PlaylistDisplayServlet extends HttpServlet {
    public void doGet(HttpServletRequest request, HttpServletResponse response) 
       throws ServletException, IOException {
   
-	   response.setContentType("text/html");
+	   response.setContentType("application/json");
       PrintWriter out = response.getWriter();
       
       //Query Strings are of the form arg=val&arg2=val2&arg3=val3
