@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * 
- * @author Marc S. Thompson (marc.steven.thomson@drexel.edu)
+ * @author Marc S. Thomson (marc.steven.thomson@drexel.edu)
  * @author Charles Unruh (ceu24@cs.drexel.edu)
  *
  */
