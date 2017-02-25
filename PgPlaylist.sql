@@ -1,4 +1,4 @@
-﻿drop table Songs cascade;
+drop table Songs cascade;
 drop table Bands cascade;
 drop table Albums cascade;
 drop table AlbumsSongs_Xref cascade;
