@@ -94,6 +94,16 @@ insert into Songs (name, duration, release_date) values ('The Time of the Beasts
 insert into Songs (name, duration, release_date) values ('Cleanse', 953, '1993-08-17');
 insert into Songs (name, duration, release_date) values ('Takeahnase', 464, '1993-08-17');
 insert into Songs (name, duration, release_date) values ('Cleanse II', 405, '1993-08-17');
+insert into Songs (name, duration, release_date) values ('Incomplete', 148, '1994-09-06');
+insert into Songs (name, duration, release_date) values ('Leave Mine to Me', 127, '1994-09-06');
+insert into Songs (name, duration, release_date) values ('Stranger than Fiction', 140, '1994-09-06');
+insert into Songs (name, duration, release_date) values ('Tiny Voices', 156, '1994-09-06');
+insert into Songs (name, duration, release_date) values ('The Handshake', 170, '1994-09-06');
+insert into Songs (name, duration, release_date) values ('Better Off Dead', 159, '1994-09-06');
+insert into Songs (name, duration, release_date) values ('Infected', 248, '1994-09-06');
+insert into Songs (name, duration, release_date) values ('Hooray for Me', 170, '1994-09-06');
+insert into Songs (name, duration, release_date) values ('Inner Logic', 178, '1994-09-06');
+insert into Songs (name, duration, release_date) values ('21st Century', 167, '1994-09-06');
 
 
 create table Bands (
@@ -110,6 +120,7 @@ insert into Bands (name, founded, disbanded) values ('Aerosmith', '1970-11-06', 
 insert into Bands (name, founded, disbanded) values ('Beach Boys', '1961-12-06', '2017-02-04');
 insert into Bands (name, founded, disbanded) values ('Ayreon', '1995-01-06', '2017-02-04');
 insert into Bands (name, founded, disbanded) values ('Neurosis', '1985-11-06', '2017-02-04');
+insert into Bands (name, founded, disbanded) values ('Bad Religion', '1979-11-11', '2017-02-04');
 
 create table Albums (
 	aid			bigserial		not null primary key,
@@ -125,6 +136,7 @@ insert into Albums (name, band) values ('Greatest Hits (Aerosmith album)', 4);
 insert into Albums (name, band) values ('Surfin'' Safari', 5);
 insert into Albums (name, band) values ('The Final Experiment', 6);
 insert into Albums (name, band) values ('Enemy of the Sun', 7);
+insert into Albums (name, band) values ('Stranger than Fiction', 8);
 
 
 create table AlbumsSongs_Xref (
@@ -211,6 +223,16 @@ insert into AlbumsSongs_Xref (aid, sid) values (7, 73);
 insert into AlbumsSongs_Xref (aid, sid) values (7, 74);
 insert into AlbumsSongs_Xref (aid, sid) values (7, 75);
 insert into AlbumsSongs_Xref (aid, sid) values (7, 76);
+insert into AlbumsSongs_Xref (aid, sid) values (8, 77);
+insert into AlbumsSongs_Xref (aid, sid) values (8, 78);
+insert into AlbumsSongs_Xref (aid, sid) values (8, 79);
+insert into AlbumsSongs_Xref (aid, sid) values (8, 80);
+insert into AlbumsSongs_Xref (aid, sid) values (8, 81);
+insert into AlbumsSongs_Xref (aid, sid) values (8, 82);
+insert into AlbumsSongs_Xref (aid, sid) values (8, 83);
+insert into AlbumsSongs_Xref (aid, sid) values (8, 84);
+insert into AlbumsSongs_Xref (aid, sid) values (8, 85);
+insert into AlbumsSongs_Xref (aid, sid) values (8, 86);
 
 create table Musicians (
 	mid			bigserial	not null primary key,
@@ -248,6 +270,11 @@ insert into Musicians (name, dob) values ('Steve Von Till', '1967-06-13');
 insert into Musicians (name, dob) values ('Dave Edwardson', '1967-06-13');
 insert into Musicians (name, dob) values ('Noah Landis', '1967-06-13');
 insert into Musicians (name, dob) values ('Jason Roeder', '1967-06-13');
+insert into Musicians (name, dob) values ('Greg Graffin', '1964-11-06');
+insert into Musicians (name, dob) values ('Brett Gurewitz', '1962-05-12');
+insert into Musicians (name, dob) values ('Jay Bentley', '1964-06-06');
+insert into Musicians (name, dob) values ('Brian Baker', '1965-02-25');
+insert into Musicians (name, dob) values ('Mike Dimkich', '1968-02-15');
 
 
 create table MusiciansSongs_Xref (
@@ -568,6 +595,56 @@ insert into MusiciansSongs_Xref (mid, sid) values (30, 73);
 insert into MusiciansSongs_Xref (mid, sid) values (30, 74);
 insert into MusiciansSongs_Xref (mid, sid) values (30, 75);
 insert into MusiciansSongs_Xref (mid, sid) values (30, 76);
+insert into MusiciansSongs_Xref (mid, sid) values (31, 77);
+insert into MusiciansSongs_Xref (mid, sid) values (31, 78);
+insert into MusiciansSongs_Xref (mid, sid) values (31, 79);
+insert into MusiciansSongs_Xref (mid, sid) values (31, 80);
+insert into MusiciansSongs_Xref (mid, sid) values (31, 81);
+insert into MusiciansSongs_Xref (mid, sid) values (31, 82);
+insert into MusiciansSongs_Xref (mid, sid) values (31, 83);
+insert into MusiciansSongs_Xref (mid, sid) values (31, 84);
+insert into MusiciansSongs_Xref (mid, sid) values (31, 85);
+insert into MusiciansSongs_Xref (mid, sid) values (31, 86);
+insert into MusiciansSongs_Xref (mid, sid) values (32, 77);
+insert into MusiciansSongs_Xref (mid, sid) values (32, 78);
+insert into MusiciansSongs_Xref (mid, sid) values (32, 79);
+insert into MusiciansSongs_Xref (mid, sid) values (32, 80);
+insert into MusiciansSongs_Xref (mid, sid) values (32, 81);
+insert into MusiciansSongs_Xref (mid, sid) values (32, 82);
+insert into MusiciansSongs_Xref (mid, sid) values (32, 83);
+insert into MusiciansSongs_Xref (mid, sid) values (32, 84);
+insert into MusiciansSongs_Xref (mid, sid) values (32, 85);
+insert into MusiciansSongs_Xref (mid, sid) values (32, 86);
+insert into MusiciansSongs_Xref (mid, sid) values (33, 77);
+insert into MusiciansSongs_Xref (mid, sid) values (33, 78);
+insert into MusiciansSongs_Xref (mid, sid) values (33, 79);
+insert into MusiciansSongs_Xref (mid, sid) values (33, 80);
+insert into MusiciansSongs_Xref (mid, sid) values (33, 81);
+insert into MusiciansSongs_Xref (mid, sid) values (33, 82);
+insert into MusiciansSongs_Xref (mid, sid) values (33, 83);
+insert into MusiciansSongs_Xref (mid, sid) values (33, 84);
+insert into MusiciansSongs_Xref (mid, sid) values (33, 85);
+insert into MusiciansSongs_Xref (mid, sid) values (33, 86);
+insert into MusiciansSongs_Xref (mid, sid) values (34, 77);
+insert into MusiciansSongs_Xref (mid, sid) values (34, 78);
+insert into MusiciansSongs_Xref (mid, sid) values (34, 79);
+insert into MusiciansSongs_Xref (mid, sid) values (34, 80);
+insert into MusiciansSongs_Xref (mid, sid) values (34, 81);
+insert into MusiciansSongs_Xref (mid, sid) values (34, 82);
+insert into MusiciansSongs_Xref (mid, sid) values (34, 83);
+insert into MusiciansSongs_Xref (mid, sid) values (34, 84);
+insert into MusiciansSongs_Xref (mid, sid) values (34, 85);
+insert into MusiciansSongs_Xref (mid, sid) values (34, 86);
+insert into MusiciansSongs_Xref (mid, sid) values (35, 77);
+insert into MusiciansSongs_Xref (mid, sid) values (35, 78);
+insert into MusiciansSongs_Xref (mid, sid) values (35, 79);
+insert into MusiciansSongs_Xref (mid, sid) values (35, 80);
+insert into MusiciansSongs_Xref (mid, sid) values (35, 81);
+insert into MusiciansSongs_Xref (mid, sid) values (35, 82);
+insert into MusiciansSongs_Xref (mid, sid) values (35, 83);
+insert into MusiciansSongs_Xref (mid, sid) values (35, 84);
+insert into MusiciansSongs_Xref (mid, sid) values (35, 85);
+insert into MusiciansSongs_Xref (mid, sid) values (35, 86);
 
 create table BandsMusicians_Xref (
 	mid			bigint		not null,
@@ -609,6 +686,11 @@ insert into BandsMusicians_Xref (mid, bid, start_date, end_date) values (27, 7, 
 insert into BandsMusicians_Xref (mid, bid, start_date, end_date) values (28, 7, '1985-11-06', '2017-02-04');
 insert into BandsMusicians_Xref (mid, bid, start_date, end_date) values (29, 7, '1985-11-06', '2017-02-04');
 insert into BandsMusicians_Xref (mid, bid, start_date, end_date) values (30, 7, '1985-11-06', '2017-02-04');
+insert into BandsMusicians_Xref (mid, bid, start_date, end_date) values (31, 8, '1979-11-11', '2017-02-04');
+insert into BandsMusicians_Xref (mid, bid, start_date, end_date) values (32, 8, '1979-11-11', '2017-02-04');
+insert into BandsMusicians_Xref (mid, bid, start_date, end_date) values (33, 8, '1979-11-11', '2017-02-04');
+insert into BandsMusicians_Xref (mid, bid, start_date, end_date) values (34, 8, '1979-11-11', '2017-02-04');
+insert into BandsMusicians_Xref (mid, bid, start_date, end_date) values (35, 8, '1979-11-11', '2017-02-04');
 
 create table Genres (
 	gid			bigserial	not null primary key,
@@ -619,6 +701,7 @@ insert into Genres (name) values ('Classic Rock');
 insert into Genres (name) values ('70s Rock');
 insert into Genres (name) values ('Progressive Metal');
 insert into Genres (name) values ('Avant-Garde Metal');
+insert into Genres (name) values ('Punk Rock');
 
 create table SongGenres_Xref (
 	sid			bigint		not null,
@@ -704,6 +787,16 @@ insert into SongGenres_Xref (sid, gid) values (73, 4);
 insert into SongGenres_Xref (sid, gid) values (74, 4);
 insert into SongGenres_Xref (sid, gid) values (75, 4);
 insert into SongGenres_Xref (sid, gid) values (76, 4);
+insert into SongGenres_Xref (sid, gid) values (77, 5);
+insert into SongGenres_Xref (sid, gid) values (78, 5);
+insert into SongGenres_Xref (sid, gid) values (79, 5);
+insert into SongGenres_Xref (sid, gid) values (80, 5);
+insert into SongGenres_Xref (sid, gid) values (81, 5);
+insert into SongGenres_Xref (sid, gid) values (82, 5);
+insert into SongGenres_Xref (sid, gid) values (83, 5);
+insert into SongGenres_Xref (sid, gid) values (84, 5);
+insert into SongGenres_Xref (sid, gid) values (85, 5);
+insert into SongGenres_Xref (sid, gid) values (86, 5);
 
 create table Users (
 	uid			bigserial		not null primary key,
@@ -760,4 +853,8 @@ insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 2, 71);
 insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 2, 72);
 insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 2, 73);
 insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 2, 74);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 2, 79);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 2, 82);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 2, 83);
+insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (1, 2, 86);
 
