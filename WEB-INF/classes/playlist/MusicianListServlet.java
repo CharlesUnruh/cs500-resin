@@ -31,25 +31,25 @@ public class MusicianListServlet extends HttpServlet {
 	_message = _DB.openDBConnection("PgBundle");
     }
 
-    public ArrayList<Musician> getMusicianList(HttpServletRequest request) throws SQLException {
+    public ArrayList<Musician> getMusicianList(HttpServletRequest request, PrintWriter out) throws SQLException {
      
        ArrayList<Musician> musicianlist = new ArrayList<Musician>();
        
        String arg_name = request.getParameter("name");
        String exactname = request.getParameter("exactname");
-       String exactband = request.getParameter("exactband");
-       String exactalbum = request.getParameter("exactalbum");
-       String exactsong = request.getParameter("exactsong");
+       String getband = request.getParameter("getband");
+       String getalbum = request.getParameter("getalbum");
+       String getsong = request.getParameter("getsong");
 
        String query = "select distinct M.name as \"Name\""; 
 			  query += ", M.dob as \"DOB\""; 
-			  if (exactband != null) {
+			  if (getband != null) {
 				  query += ", B.name as \"Band\""; 
 			  }
-			  if (exactalbum != null) {
+			  if (getalbum != null) {
 				  query += ", A.name as \"Album\"";
 			  }
-			  if (exactsong != null) {
+			  if (getsong != null) {
 				  query += ", S.name as \"Song\"";
 			  }
 			  query += " from Musicians M";
@@ -59,7 +59,6 @@ public class MusicianListServlet extends HttpServlet {
 			  query += " inner join Songs S on (MS_X.sid = S.sid)";
 			  query += " inner join AlbumsSongs_Xref AS_X on (S.sid = AS_X.sid)";
 			  query += " inner join Albums A on (AS_X.aid = A.aid)";
-			  query += " order by B.name, M.dob";
 	           //COALESCE returns first of its arguments that isn't null.
 	           //Here, we use it to say, if there isn't an argument,
 	           //don't constrain the search (e.g. M.name will always equal M.name)
@@ -68,6 +67,7 @@ public class MusicianListServlet extends HttpServlet {
 	           } else {
 	               query += " where (M.name like '%'||coalesce(?, M.name)||'%')";
 	           }
+			  query += " order by M.name, M.dob";
 			  query += ";";
       
         //This is how we'll handle being safe from SQL injection
@@ -83,9 +83,18 @@ public class MusicianListServlet extends HttpServlet {
         while (rs.next()) {
 			String name = rs.getString("Name");
 			Date dob = rs.getDate("DOB"); 
-			String band = rs.getString("Band");
-			String album = rs.getString("Album");
-			String song = rs.getString("Song");
+			String band = null;
+			String album = null;
+			String song = null;
+			if (getband != null) {
+			   band = rs.getString("Band");
+			}
+			if (getalbum != null) {
+			   album = rs.getString("Album");
+			}
+			if (getsong != null) {
+			   song = rs.getString("Song");
+			}
 			Musician musician = new Musician(name, dob, band, album, song);
            
 			musicianlist.add(musician);
@@ -117,7 +126,7 @@ public class MusicianListServlet extends HttpServlet {
          response.getWriter().println(jsonResponse.toJson());
 	   } else {    
          try {
-        	 ArrayList<Musician> musicianlist = getMusicianList(request);
+        	 ArrayList<Musician> musicianlist = getMusicianList(request, out);
             Gson gson = new Gson();
             JsonResponse jsonResponse = new JsonResponse("OK",gson.toJson(musicianlist));
             response.getWriter().println(jsonResponse.toJson());

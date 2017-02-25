@@ -21,12 +21,12 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>FrontendServlet</servlet-name>
-    <servlet-class>playlist.Frontend</servlet-class>
+    <servlet-name>MusicianListServlet</servlet-name>
+    <servlet-class>playlist.MusicianListServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-	  <servlet-name>FrontendServlet</servlet-name>
-	  <url-pattern>/frontend</url-pattern>
+	  <servlet-name>MusicianListServlet</servlet-name>
+	  <url-pattern>/musicianlist</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -36,6 +36,15 @@
   <servlet-mapping>
 	  <servlet-name>PlaylistDisplayServlet</servlet-name>
 	  <url-pattern>/playlistdisplay</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>FrontendServlet</servlet-name>
+    <servlet-class>playlist.Frontend</servlet-class>
+  </servlet>
+  <servlet-mapping>
+	  <servlet-name>FrontendServlet</servlet-name>
+	  <url-pattern>/frontend</url-pattern>
   </servlet-mapping>
 
   <servlet>

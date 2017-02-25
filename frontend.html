@@ -155,13 +155,13 @@ function handlePlaylistRequest(xhr) {
       output += "<p>Created on (" + data[0].createdDate + ") and last modified on (" + data[0].modifiedDate + ")</p>";
       output += "<table><tr><td>Title</td><td>Duration</td><td>Album</td><td>Band</td><td>Release Date</td><td>Genre</td></tr>";
       for ( var i=0; i < data.length; i++){
-/*         if (current_playlist != data[i].name){
+         if (current_playlist != data[i].name){
             current_playlist = data[i].name;
             output += "</table>";
             output += "<h3>" + username + "'s \"" + current_playlist + "\" Playlist!</h3>";
             output += "<p>Created on (" + data[i].createdDate + ") and last modified on (" + data[i].modifiedDate + "</p>";
             output += "<table><tr><td>Title</td><td>Duration</td><td>Album</td><td>Band</td><td>Release Date</td><td>Genre</td></tr>";
-         }*/
+         }
          output += "<tr>";
          output += "<td>" + data[i].song + "</td>";
          output += "<td>" + data[i].duration + "</td>";
