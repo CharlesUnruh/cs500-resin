@@ -56,7 +56,7 @@ public class PlaylistInsertServlet extends HttpServlet {
     	
         String query2 = "update Playlists P set modified = "; 
  		  	   query2 += today; 
- 		       query2 += " where P.name = " + arg_playlist; 
+ 		       query2 += " where P.name = ?"; 
  	           query2 += ";";
 
        //This is how we'll handle being safe from SQL injection
@@ -65,9 +65,7 @@ public class PlaylistInsertServlet extends HttpServlet {
        // 1 means 1st question mark, 2 means 2nd, and so on.
        // the second argument is what to replace the question mark by.
         preparedStatement = _DB.prepareStatement(query);
-        preparedStatement.setString(1,arg_username);
-        preparedStatement.setString(2,arg_playlist);
-        preparedStatement.setString(3,arg_song);
+        preparedStatement.setString(1,arg_playlist);
  		rs = preparedStatement.executeQuery();
      	String result2 = rs.getString(1);
 

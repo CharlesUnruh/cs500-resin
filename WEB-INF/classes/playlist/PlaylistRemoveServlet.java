@@ -35,9 +35,9 @@ public class PlaylistRemoveServlet extends HttpServlet {
     public String removeFromPlaylist(String arg_username, String arg_playlist, String arg_song) throws SQLException {
      
        String query = "delete from UsersPlaylistsSongs_Xref UPS_X"; 
-		  	  query += "where UPS_X.uid = (select uid from Users U where U.username = " + arg_username + ")"; 
-		      query += "and UPS_X.pid = (select pid from Playlists P where P.name = " + arg_playlist + ")"; 
-		      query += "and UPS_X.sid = (select sid from Songs S where S.name = " + arg_song + ")"; 
+		  	  query += "where UPS_X.uid = (select uid from Users U where U.username = ?),";  
+		      query += "and UPS_X.pid = (select pid from Playlists P where P.name = ?),";  
+		      query += "and UPS_X.sid = (select sid from Songs S where S.name = ?),";  
 	          query += ";";
 
 	          //This is how we'll handle being safe from SQL injection
@@ -56,7 +56,7 @@ public class PlaylistRemoveServlet extends HttpServlet {
     	
         String query2 = "update Playlists P set modified = "; 
  		  	   query2 += today; 
- 		       query2 += " where P.name = " + arg_playlist; 
+ 		       query2 += " where P.name = ?"; 
  	           query2 += ";";
 
  	          //This is how we'll handle being safe from SQL injection

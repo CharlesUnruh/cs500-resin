@@ -37,7 +37,7 @@ public class PlaylistCreateServlet extends HttpServlet {
      	Date today = (Date) Calendar.getInstance().getTime();
     	
     	String query = "insert into Playlists (uid, pid, sid) values ("; 
- 		  	  query += arg_playlist + ","; 
+ 		  	  query += " ? ,"; 
  		      query += today + ","; 
  		      query += today + ")"; 
  	          query += ";";
@@ -53,9 +53,9 @@ public class PlaylistCreateServlet extends HttpServlet {
      	String result1 = rs.getString(1);
      	
         String query2 = "insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values ("; 
- 		  	  query2 += "(select uid from Users U where U.username = " + arg_username + "),"; 
- 		      query2 += "(select pid from Playlists P where P.name = " + arg_playlist + "),"; 
- 		      query2 += "(select sid from Songs S where S.name = " + arg_song + "),"; 
+ 		  	  query2 += "(select uid from Users U where U.username = ?),"; 
+ 		      query2 += "(select pid from Playlists P where P.name = ?),"; 
+ 		      query2 += "(select sid from Songs S where S.name = ?),"; 
  	          query2 += ";";
 
  	         //This is how we'll handle being safe from SQL injection
