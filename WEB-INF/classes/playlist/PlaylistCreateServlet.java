@@ -42,7 +42,13 @@ public class PlaylistCreateServlet extends HttpServlet {
  		      query += today + ")"; 
  	          query += ";";
 
+ 	         //This is how we'll handle being safe from SQL injection
+ 	         // the set___ functions take the first number as the number of the
+ 	         // question mark, in order of appearence, to replace.
+ 	         // 1 means 1st question mark, 2 means 2nd, and so on.
+ 	         // the second argument is what to replace the question mark by.
         PreparedStatement preparedStatement = _DB.prepareStatement(query);
+        preparedStatement.setString(1,arg_playlist);
  		ResultSet rs = preparedStatement.executeQuery();
      	String result1 = rs.getString(1);
      	
@@ -52,7 +58,15 @@ public class PlaylistCreateServlet extends HttpServlet {
  		      query2 += "(select sid from Songs S where S.name = " + arg_song + "),"; 
  	          query2 += ";";
 
+ 	         //This is how we'll handle being safe from SQL injection
+ 	         // the set___ functions take the first number as the number of the
+ 	         // question mark, in order of appearence, to replace.
+ 	         // 1 means 1st question mark, 2 means 2nd, and so on.
+ 	         // the second argument is what to replace the question mark by.
         preparedStatement = _DB.prepareStatement(query2);
+        preparedStatement.setString(1,arg_username);
+        preparedStatement.setString(2,arg_playlist);
+        preparedStatement.setString(3,arg_song);
  		rs = preparedStatement.executeQuery();
      	String result2 = rs.getString(1);
      	
