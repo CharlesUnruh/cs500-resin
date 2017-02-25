@@ -35,9 +35,9 @@ public class PlaylistInsertServlet extends HttpServlet {
     public String addToPlaylist(String arg_username, String arg_playlist, String arg_song) throws SQLException {
      
        String query = "insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values ("; 
-		  	  query += "(select uid from Users U where U.username = " + arg_username + "),"; 
-		      query += "(select pid from Playlists P where P.name = " + arg_playlist + "),"; 
-		      query += "(select sid from Songs S where S.name = " + arg_song + "),"; 
+		  	  query += "(select uid from Users U where U.username = ?),"; 
+		      query += "(select pid from Playlists P where P.name = ?),"; 
+		      query += "(select sid from Songs S where S.name = ?),"; 
 	          query += ";";
 
 	          //This is how we'll handle being safe from SQL injection
