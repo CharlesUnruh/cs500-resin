@@ -37,9 +37,9 @@ public class MusicianListServlet extends HttpServlet {
        
        String arg_name = request.getParameter("name");
        String exactname = request.getParameter("exactname");
-       String getband = request.getParameter("getband");
-       String getalbum = request.getParameter("getalbum");
-       String getsong = request.getParameter("getsong");
+       String getband = request.getParameter("getbands");
+       String getalbum = request.getParameter("getalbums");
+       String getsong = request.getParameter("getsongs");
 
        String query = "select distinct M.name as \"Name\""; 
 			  query += ", M.dob as \"DOB\""; 

@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <body onload="init();">
-<p>
+<p><h1>
 Playlist Demo Frontend
-</p>
+</h1></p>
 <p id="DEBUG"></p>
 
 <div id="SongRequestDiv">
-   <p id="SongListTitle">Query Song Database</p>
+   <p id="SongListTitle"><h2>Query Song Database</h2></p>
    <form id="SongListForm">
       Song Title:
       <input type="text" id="SongListInputTitle">
@@ -30,12 +30,13 @@ Playlist Demo Frontend
       <input type="checkbox" name="exacttitle" value="true" id="SongListMatchGenre">
       <br>
       <input type="button" value="Submit" id="SongListFormSubmit">
+      <input type="button" value="Clear Results" id="SongListFormClear">
    </form>
    <p id="SongListReturn"></p>
 </div>
 
 <div id="PlaylistRequestDiv">
-   <p id="PlaylistRequestTitle">Get Playlist</p>
+   <p id="PlaylistRequestTitle"><h2>Get Playlist</h2></p>
    <form id="PlaylistRequestForm">
       Username:
       <input type="text" id="PlaylistRequestUsername">
@@ -46,8 +47,30 @@ Playlist Demo Frontend
       <input type="checkbox" name="exactplaylistname" value=true id="PlaylistRequestMatchPlaylistName">
       <br>
       <input type="button" value="Submit" id="PlaylistRequestFormSubmit">
+      <input type="button" value="Clear Results" id="PlaylistRequestFormClear">
    </form>
    <p id="PlaylistRequestReturn"></p>
+</div>
+
+<div id="MusicianRequestDiv">
+   <p id="MusicianRequestTitle"><h2>Query Musician Database</h2></p>
+   <form id="MusicianRequestForm">
+      Musician Name:
+      <input type="text" id="MusicianRequestInputName">
+      Exact Match:
+      <input type="checkbox" name="exactname" value="true" id="MusicianRequestMatchName">
+      <br>
+      Get Albums:
+      <input type="checkbox" name="getalbums" value="true" id="MusicianRequestGetAlbums">
+      Get Bands:
+      <input type="checkbox" name="getbands" value="true" id="MusicianRequestGetBands">
+      Get Songs:
+      <input type="checkbox" name="getsongs" value="true" id="MusicianRequestGetSongs">
+      <br>
+      <input type="button" value="Submit" id="MusicianRequestFormSubmit">
+      <input type="button" value="Clear Results" id="MusicianRequestFormClear">
+   </form>
+   <p id="MusicianRequestReturn"></p>
 </div>
 
 <script>
@@ -57,6 +80,19 @@ function init()
    btn_SongListRequest.addEventListener('click', getSongList, false);
    var btn_PlaylistRequest = document.getElementById("PlaylistRequestFormSubmit");
    btn_PlaylistRequest.addEventListener('click', getPlaylist, false);
+   var btn_MusicianRequest = document.getElementById("MusicianRequestFormSubmit");
+   btn_MusicianRequest.addEventListener('click', getMusician, false);
+   var btn_SongListRequestClear = document.getElementById("SongListFormClear")
+   btn_SongListRequestClear.addEventListener('click', function() { clear("SongListReturn");}, false);
+   var btn_PlaylistRequestClear = document.getElementById("PlaylistRequestFormClear")
+   btn_PlaylistRequestClear.addEventListener('click', function() { clear("PlaylistRequestReturn");}, false);
+   var btn_MusicianRequestClear = document.getElementById("MusicianRequestFormClear")
+   btn_MusicianRequestClear.addEventListener('click', function() { clear("MusicianRequestReturn");}, false);
+}
+
+function clear(id)
+{
+   document.getElementById(id).innerHTML = "";
 }
 
 function getSongList()
@@ -108,6 +144,35 @@ function getPlaylist()
 
    xhr.open('GET', request, true);
    xhr.onreadystatechange = function () {handlePlaylistRequest(xhr);} ;
+   xhr.send();
+}
+
+function getMusician()
+{
+   var getalbums = document.getElementById("MusicianRequestGetAlbums").checked;
+   var getbands = document.getElementById("MusicianRequestGetBands").checked;
+   var getsongs = document.getElementById("MusicianRequestGetSongs").checked;
+
+   var xhr = new XMLHttpRequest();
+   var request = "http://resin.cci.drexel.edu:8080/~ceu24/musicianlist?&";
+   var val = document.getElementById("MusicianRequestInputName").value;
+   if (val != "") { request += "name=" + val + "&"; }
+
+   if (document.getElementById("MusicianRequestMatchName").checked){ 
+      request += "exactname=true" + "&";
+   }
+   if (getalbums){ 
+      request += "getalbums=true" + "&";
+   }
+   if (getbands){ 
+      request += "getbands=true" + "&";
+   }
+   if (getsongs){ 
+      request += "getsongs=true" + "&";
+   }
+
+   xhr.open('GET', request, true);
+   xhr.onreadystatechange = function () {handleMusicianRequest(xhr,getalbums,getbands,getsongs);} ;
    xhr.send();
 }
 
@@ -175,6 +240,76 @@ function handlePlaylistRequest(xhr) {
       document.getElementById("PlaylistRequestReturn").innerHTML = output;
    }
 }
+
+function handleMusicianRequest(xhr,getalbums,getbands,getsongs) {
+   if (xhr.readyState == 4 && xhr.status == 200){
+      var response = JSON.parse(xhr.responseText);
+      var data = JSON.parse(response.data);
+      var output = "";
+
+      if (data.length == 0) {
+         document.getElementById("MusicianRequestReturn").innerHTML = output;
+         return;
+      }
+
+      var current_musician = data[0].name;
+      output += "<div id=\"" + current_musician +"-results\">"
+      output += "<h3>" + current_musician + " - Born (" + data[0].dob + ")</h3><div id=\"MusicianRequestResultDiv\"";
+      var albums_set = new Set();
+      var bands_set = new Set();
+      var songs_set = new Set();
+      var albums = "<table><tr><td><h4>Albums</h4></td></tr>";
+      var bands = "<table><tr><td><h4>Bands</h4></td></tr>";
+      var songs = "<table><tr><td><h4>Songs</h4></td></tr>";
+      var nmusicians = 1; 
+      for (var i=0; i < data.length; i++) {
+         if (current_musician != data[i].name){
+            for (let item of albums_set){
+               albums += "<tr><td>" + item + "</td></tr>";
+            }
+            for (let item of bands_set){
+               bands += "<tr><td>" + item + "</td></tr>";
+            }
+            for (let item of songs_set){
+               songs += "<tr><td>" + item + "</td></tr>";
+            }
+            if (getalbums){ output += "<div id=\"" + current_musician +"-albums\">"+albums+"</table></div>"; }
+            if (getbands) { output += "<div id=\"" + current_musician +"-bands\">"+bands+"</table></div>"; }
+            if (getsongs) { output += "<div id=\"" + current_musician +"-songs\">"+songs+"</table></div>"; }
+            output += "</div>";
+            current_musician = data[i].name;
+            output += "<div id=\"" + current_musician +"-results\">"
+            output += "<h3>" + current_musician + " - Born (" + data[i].dob + ")</h3>";
+            albums = "<table><tr><td><h4>Albums</h4></td></tr>";
+            bands = "<table><tr><td><h4>Bands</h4></td></tr>";
+            songs = "<table><tr><td><h4>Songs</h4></td></tr>";
+            albums_set = new Set();
+            bands_set = new Set();
+            songs_set = new Set();
+            nmusicians += 1;
+         }
+         albums_set.add(data[i].album);
+         bands_set.add(data[i].band);
+         songs_set.add(data[i].song);
+      }
+      for (let item of albums_set){
+         albums += "<tr><td>" + item + "</td></tr>";
+      }
+      for (let item of bands_set){
+         bands += "<tr><td>" + item + "</td></tr>";
+      }
+      for (let item of songs_set){
+         songs += "<tr><td>" + item + "</td></tr>";
+      }
+      if (getalbums){ output += "<div id=\"" + current_musician +"-albums\">"+albums+"</table></div>"; }
+      if (getbands) { output += "<div id=\"" + current_musician +"-bands\">"+bands+"</table></div>"; }
+      if (getsongs) { output += "<div id=\"" + current_musician +"-songs\">"+songs+"</table></div>"; }
+      output += "</div>";
+      output = "<p>We found " + nmusicians + " musicians matching your search!</p>" + output;
+      document.getElementById("MusicianRequestReturn").innerHTML = output;
+   }
+}
+
 </script>
 </body>
 </html>
