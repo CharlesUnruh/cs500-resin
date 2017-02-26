@@ -54,6 +54,9 @@ public class SongListServlet extends HttpServlet {
         String exactband = request.getParameter("exactband");
         String exactalbum = request.getParameter("exactalbum");
         String exactgenre = request.getParameter("exactgenre");
+        String sortband = request.getParameter("sortbands");
+        String sortalbum = request.getParameter("sortalbums");
+        String sortgenre = request.getParameter("sortgenre");
 
         // retrieve from the database, information for the response
         String query = "select S.name as \"Title\"";
@@ -91,11 +94,18 @@ public class SongListServlet extends HttpServlet {
         } else {
             query += " and (G.name like '%'||coalesce(?, G.name)||'%')";
         }
+        if (sortband != null) {
+            query += "  order by B.name";
+        } else if (sortalbum != null) {
+            query += "  order by A.name";
+        } else if (sortgenre != null) {
+            query += "  order by G.name";
+        }
         query += ";";
 
         // This is how we'll handle being safe from SQL injection
         // the set___ functions take the first number as the number of the
-        // question mark, in order of appearence, to replace.
+        // question mark, in order of appearance, to replace.
         // 1 means 1st question mark, 2 means 2nd, and so on.
         // the second argument is what to replace the question mark by.
         PreparedStatement preparedStatement = _DB.prepareStatement(query);

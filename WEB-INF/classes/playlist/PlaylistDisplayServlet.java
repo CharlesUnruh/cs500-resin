@@ -80,7 +80,7 @@ public class PlaylistDisplayServlet extends HttpServlet {
 
         // This is how we'll handle being safe from SQL injection
         // the set___ functions take the first number as the number of the
-        // question mark, in order of appearence, to replace.
+        // question mark, in order of appearance, to replace.
         // 1 means 1st question mark, 2 means 2nd, and so on.
         // the second argument is what to replace the question mark by.
         PreparedStatement preparedStatement = _DB.prepareStatement(query);

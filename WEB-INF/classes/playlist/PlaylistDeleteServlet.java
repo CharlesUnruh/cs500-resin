@@ -32,13 +32,16 @@ public class PlaylistDeleteServlet extends HttpServlet {
     }
 
     /**
-     * Remove song from the playlist by querying the RDBMS
+     * Remove a playlist from the database
      * 
-     * @param arg_username
-     * @param arg_playlist
-     * 
+     * @param request
+     *            - front end request
      */
-    public String deletePlaylist(String arg_username, String arg_playlist) throws SQLException {
+    public String deletePlaylist(HttpServletRequest request) throws SQLException {
+
+        // get the parameters from the request
+        String arg_username = request.getParameter("username");
+        String arg_playlist = request.getParameter("playlist");
 
         // update the database, from the input parameters
         String query = "delete from UsersPlaylistsSongs_Xref UPS_X";
@@ -48,7 +51,7 @@ public class PlaylistDeleteServlet extends HttpServlet {
 
         // This is how we'll handle being safe from SQL injection
         // the set___ functions take the first number as the number of the
-        // question mark, in order of appearence, to replace.
+        // question mark, in order of appearance, to replace.
         // 1 means 1st question mark, 2 means 2nd, and so on.
         // the second argument is what to replace the question mark by.
         PreparedStatement preparedStatement = _DB.prepareStatement(query);
@@ -63,7 +66,7 @@ public class PlaylistDeleteServlet extends HttpServlet {
 
         // This is how we'll handle being safe from SQL injection
         // the set___ functions take the first number as the number of the
-        // question mark, in order of appearence, to replace.
+        // question mark, in order of appearance, to replace.
         // 1 means 1st question mark, 2 means 2nd, and so on.
         // the second argument is what to replace the question mark by.
         preparedStatement = _DB.prepareStatement(query2);
@@ -88,15 +91,13 @@ public class PlaylistDeleteServlet extends HttpServlet {
         // if I request http://resin.cci.drexel.edu/songlist?title=abc
         // title will have the value "abc" and the rest will be null
         // out.println(request.getQueryString());
-        String username = request.getParameter("username");
-        String playlist = request.getParameter("playlist");
 
         if (!_message.startsWith("Servus")) {
             JsonResponse jsonResponse = new JsonResponse("ERROR", _message);
             response.getWriter().println(jsonResponse.toJson());
         } else {
             try {
-                String result = deletePlaylist(username, playlist);
+                String result = deletePlaylist(request);
                 Gson gson = new Gson();
                 JsonResponse jsonResponse = new JsonResponse("OK", gson.toJson(result));
                 response.getWriter().println(jsonResponse.toJson());
