@@ -12,12 +12,12 @@ drop table Playlists cascade;
 drop table UsersPlaylistsSongs_Xref cascade;
 
 create table Songs (
-	sid				bigserial		not null primary key,
-	name			varchar(128)	not null,
-	duration		integer,
-	release_date	date
-	);
-	
+    sid             bigserial       not null primary key,
+    name            varchar(128)    not null,
+    duration        integer,
+    release_date    date
+    );
+    
 insert into Songs (name, duration, release_date) values ('Sgt. Pepper''s Lonely Hearts Club Band', 122, '1967-06-01');
 insert into Songs (name, duration, release_date) values ('With a Little Help from My Friends', 164, '1967-06-01');
 insert into Songs (name, duration, release_date) values ('Lucy in the Sky with Diamonds', 208, '1967-06-01');
@@ -107,11 +107,11 @@ insert into Songs (name, duration, release_date) values ('21st Century', 167, '1
 
 
 create table Bands (
-	bid			bigserial		not null primary key,
-	name		varchar(128)	not null,
-	founded		date,
-	disbanded	date
-	);	
+    bid         bigserial       not null primary key,
+    name        varchar(128)    not null,
+    founded     date,
+    disbanded   date
+    );
 
 insert into Bands (name, founded, disbanded) values ('Beatles', '1960-08-15', '1970-12-31');
 insert into Bands (name, founded, disbanded) values ('Led Zeppelin', '1968-10-25', '1980-09-25');
@@ -123,11 +123,11 @@ insert into Bands (name, founded, disbanded) values ('Neurosis', '1985-11-06', '
 insert into Bands (name, founded, disbanded) values ('Bad Religion', '1979-11-11', '2017-02-04');
 
 create table Albums (
-	aid			bigserial		not null primary key,
-	name		varchar(128)	not null,
-	band		integer			not null,
-	foreign key (band) references Bands(bid)
-	);
+    aid         bigserial       not null primary key,
+    name        varchar(128)    not null,
+    band        integer         not null,
+    foreign key (band) references Bands(bid)
+    );
 
 insert into Albums (name, band) values ('Sgt. Pepper''s Lonely Hearts Club Band', 1);
 insert into Albums (name, band) values ('Led Zeppelin IV', 2);
@@ -140,12 +140,12 @@ insert into Albums (name, band) values ('Stranger than Fiction', 8);
 
 
 create table AlbumsSongs_Xref (
-	aid			bigint		not null,
-	sid			bigint		not null,
-	foreign key(aid) references Albums(aid),
-	foreign key(sid) references Songs(sid),
-	primary key(aid,sid)
-	);
+    aid         bigint      not null,
+    sid         bigint      not null,
+    foreign key(aid) references Albums(aid),
+    foreign key(sid) references Songs(sid),
+    primary key(aid,sid)
+    );
 
 insert into AlbumsSongs_Xref (aid, sid) values (1, 1);
 insert into AlbumsSongs_Xref (aid, sid) values (1, 2);
@@ -235,10 +235,10 @@ insert into AlbumsSongs_Xref (aid, sid) values (8, 85);
 insert into AlbumsSongs_Xref (aid, sid) values (8, 86);
 
 create table Musicians (
-	mid			bigserial	not null primary key,
-	name		varchar(64)	not null,
-	dob			date		not null
-	);
+    mid         bigserial   not null primary key,
+    name        varchar(64) not null,
+    dob         date        not null
+    );
 
 insert into Musicians (name, dob) values ('John Lennon', '1940-10-09');
 insert into Musicians (name, dob) values ('Paul McCartney', '1942-06-18');
@@ -278,12 +278,12 @@ insert into Musicians (name, dob) values ('Mike Dimkich', '1968-02-15');
 
 
 create table MusiciansSongs_Xref (
-	mid			bigint		not null,
-	sid			bigint		not null,
-	foreign key(mid) references Musicians(mid),
-	foreign key(sid) references Songs(sid),
-	primary key(mid,sid)
-	);
+    mid         bigint      not null,
+    sid         bigint      not null,
+    foreign key(mid) references Musicians(mid),
+    foreign key(sid) references Songs(sid),
+    primary key(mid,sid)
+    );
 
 insert into MusiciansSongs_Xref (mid, sid) values (1, 1);
 insert into MusiciansSongs_Xref (mid, sid) values (1, 2);
@@ -647,14 +647,14 @@ insert into MusiciansSongs_Xref (mid, sid) values (35, 85);
 insert into MusiciansSongs_Xref (mid, sid) values (35, 86);
 
 create table BandsMusicians_Xref (
-	mid			bigint		not null,
-	bid			bigint		not null,
-	start_date	date		not null,
-	end_date	date		not null,
-	foreign key (mid) references Musicians(mid),
-	foreign key (bid) references Bands(bid),
-	primary key(mid,bid,start_date,end_date)
-	);
+    mid         bigint      not null,
+    bid         bigint      not null,
+    start_date  date        not null,
+    end_date    date        not null,
+    foreign key (mid) references Musicians(mid),
+    foreign key (bid) references Bands(bid),
+    primary key(mid,bid,start_date,end_date)
+    );
 
 insert into BandsMusicians_Xref (mid, bid, start_date, end_date) values (1, 1, '1960-08-15', '1970-12-31');
 insert into BandsMusicians_Xref (mid, bid, start_date, end_date) values (2, 1, '1960-08-15', '1970-12-31');
@@ -693,9 +693,9 @@ insert into BandsMusicians_Xref (mid, bid, start_date, end_date) values (34, 8, 
 insert into BandsMusicians_Xref (mid, bid, start_date, end_date) values (35, 8, '1979-11-11', '2017-02-04');
 
 create table Genres (
-	gid			bigserial	not null primary key,
-	name		varchar(64)	not null
-	);
+    gid         bigserial   not null primary key,
+    name        varchar(64) not null
+    );
 
 insert into Genres (name) values ('Classic Rock');
 insert into Genres (name) values ('70s Rock');
@@ -704,12 +704,12 @@ insert into Genres (name) values ('Avant-Garde Metal');
 insert into Genres (name) values ('Punk Rock');
 
 create table SongGenres_Xref (
-	sid			bigint		not null,
-	gid			bigint		not null,
-	foreign key (sid) references Songs(sid),
-	foreign key (gid) references Genres(gid),
-	primary key (sid,gid)
-	);
+    sid         bigint      not null,
+    gid         bigint      not null,
+    foreign key (sid) references Songs(sid),
+    foreign key (gid) references Genres(gid),
+    primary key (sid,gid)
+    );
 
 insert into SongGenres_Xref (sid, gid) values (1, 1);
 insert into SongGenres_Xref (sid, gid) values (2, 1);
@@ -799,34 +799,34 @@ insert into SongGenres_Xref (sid, gid) values (85, 5);
 insert into SongGenres_Xref (sid, gid) values (86, 5);
 
 create table Users (
-	uid			bigserial		not null primary key,
-	username	varchar(64)		not null,
-	email_addr	varchar(64)		not null,
-	salt		char(36)		not null,
-	password	varchar(128)	not null	
-	);
+    uid         bigserial       not null primary key,
+    username    varchar(64)     not null,
+    email_addr  varchar(64)     not null,
+    salt        char(36)        not null,
+    password    varchar(128)    not null
+    );
 
 insert into Users (username, email_addr, salt, password) values ('cunruh', 'cunruh3760@gmail.com', '123', '45678');
 insert into Users (username, email_addr, salt, password) values ('mthomson', 'mthomson856@gmail.com', '678', '12345');
 
 create table Playlists (
-	pid			bigserial	not null primary key,
-	name		varchar(128)	not null,
-	created		date		not null,
-	modified	date		not null
-	);
+    pid         bigserial   not null primary key,
+    name        varchar(128)    not null,
+    created     date        not null,
+    modified    date        not null
+    );
 
 insert into Playlists (name, created, modified) values ('Marc''s Rock', '2017-02-01', '2017-02-02');
 insert into Playlists (name, created, modified) values ('Charle''s Music', '2017-02-25', '2017-02-25');
 insert into Playlists (name, created, modified) values ('Charle''s Rock', '2017-02-25', '2017-02-25');
 
 create table UsersPlaylistsSongs_Xref (
-       uid		bigint		not null,
-       pid		bigint		not null,
-       sid		bigint		not null,
-	primary key(uid,pid,sid)
-	);
-	
+       uid      bigint      not null,
+       pid      bigint      not null,
+       sid      bigint      not null,
+    primary key(uid,pid,sid)
+    );
+
 insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (2, 1, 1);
 insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (2, 1, 2);
 insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (2, 1, 3);
