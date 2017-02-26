@@ -36,12 +36,16 @@ public class PlaylistRemoveServlet extends HttpServlet {
     /**
      * Remove song from the playlist by querying the RDBMS
      * 
-     * @param arg_username
-     * @param arg_playlist
-     * @param arg_song
+     * @param request
+     *            - front end request
      * 
      */
-    public String removeFromPlaylist(String arg_username, String arg_playlist, String arg_song) throws SQLException {
+    public String removeFromPlaylist(HttpServletRequest request) throws SQLException {
+
+        // get the parameters from the request
+        String arg_username = request.getParameter("username");
+        String arg_playlist = request.getParameter("playlist");
+        String arg_song = request.getParameter("song");
 
         // update the database, from the input parameters
         String query = "delete from UsersPlaylistsSongs_Xref UPS_X";
@@ -52,7 +56,7 @@ public class PlaylistRemoveServlet extends HttpServlet {
 
         // This is how we'll handle being safe from SQL injection
         // the set___ functions take the first number as the number of the
-        // question mark, in order of appearence, to replace.
+        // question mark, in order of appearance, to replace.
         // 1 means 1st question mark, 2 means 2nd, and so on.
         // the second argument is what to replace the question mark by.
         PreparedStatement preparedStatement = _DB.prepareStatement(query);
@@ -65,6 +69,7 @@ public class PlaylistRemoveServlet extends HttpServlet {
         // get today's date and convert to sql date data type
         Date today = (Date) Calendar.getInstance().getTime();
 
+        // update the database, from the input parameters
         String query2 = "update Playlists P set modified = ";
         query2 += today;
         query2 += " where P.name = ?";
@@ -72,7 +77,7 @@ public class PlaylistRemoveServlet extends HttpServlet {
 
         // This is how we'll handle being safe from SQL injection
         // the set___ functions take the first number as the number of the
-        // question mark, in order of appearence, to replace.
+        // question mark, in order of appearance, to replace.
         // 1 means 1st question mark, 2 means 2nd, and so on.
         // the second argument is what to replace the question mark by.
         preparedStatement = _DB.prepareStatement(query2);
@@ -105,16 +110,13 @@ public class PlaylistRemoveServlet extends HttpServlet {
         // if I request http://resin.cci.drexel.edu/songlist?title=abc
         // title will have the value "abc" and the rest will be null
         // out.println(request.getQueryString());
-        String username = request.getParameter("username");
-        String playlist = request.getParameter("playlist");
-        String song = request.getParameter("song");
 
         if (!_message.startsWith("Servus")) {
             JsonResponse jsonResponse = new JsonResponse("ERROR", _message);
             response.getWriter().println(jsonResponse.toJson());
         } else {
             try {
-                String result = removeFromPlaylist(username, playlist, song);
+                String result = removeFromPlaylist(request);
                 Gson gson = new Gson();
                 // need to determine return string
                 JsonResponse jsonResponse = new JsonResponse("OK", gson.toJson(result));

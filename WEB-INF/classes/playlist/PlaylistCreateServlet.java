@@ -33,11 +33,24 @@ public class PlaylistCreateServlet extends HttpServlet {
         _message = _DB.openDBConnection("PgBundle");
     }
 
-    public String createPlaylist(String arg_username, String arg_playlist, String arg_song) throws SQLException {
+    /**
+     * Create a new playlist using the input parameters
+     * 
+     * @param request
+     *            - front end request
+     * 
+     */
+    public String createPlaylist(HttpServletRequest request) throws SQLException {
+
+        // get the parameters from the request
+        String arg_username = request.getParameter("username");
+        String arg_playlist = request.getParameter("playlist");
+        String arg_song = request.getParameter("song");
 
         // get today's date and convert to sql date data type
         Date today = (Date) Calendar.getInstance().getTime();
 
+        // update the database, from the input parameters
         String query = "insert into Playlists (uid, pid, sid) values (";
         query += " ? ,";
         query += today + ",";
@@ -46,7 +59,7 @@ public class PlaylistCreateServlet extends HttpServlet {
 
         // This is how we'll handle being safe from SQL injection
         // the set___ functions take the first number as the number of the
-        // question mark, in order of appearence, to replace.
+        // question mark, in order of appearance, to replace.
         // 1 means 1st question mark, 2 means 2nd, and so on.
         // the second argument is what to replace the question mark by.
         PreparedStatement preparedStatement = _DB.prepareStatement(query);
@@ -54,6 +67,7 @@ public class PlaylistCreateServlet extends HttpServlet {
         ResultSet rs = preparedStatement.executeQuery();
         String result1 = rs.getString(1);
 
+        // update the database, from the input parameters
         String query2 = "insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (";
         query2 += "(select uid from Users U where U.username = ?),";
         query2 += "(select pid from Playlists P where P.name = ?),";
@@ -62,7 +76,7 @@ public class PlaylistCreateServlet extends HttpServlet {
 
         // This is how we'll handle being safe from SQL injection
         // the set___ functions take the first number as the number of the
-        // question mark, in order of appearence, to replace.
+        // question mark, in order of appearance, to replace.
         // 1 means 1st question mark, 2 means 2nd, and so on.
         // the second argument is what to replace the question mark by.
         preparedStatement = _DB.prepareStatement(query2);
@@ -97,16 +111,13 @@ public class PlaylistCreateServlet extends HttpServlet {
         // if I request http://resin.cci.drexel.edu/songlist?title=abc
         // title will have the value "abc" and the rest will be null
         // out.println(request.getQueryString());
-        String username = request.getParameter("username");
-        String playlist = request.getParameter("playlist");
-        String song = request.getParameter("song");
 
         if (!_message.startsWith("Servus")) {
             JsonResponse jsonResponse = new JsonResponse("ERROR", _message);
             response.getWriter().println(jsonResponse.toJson());
         } else {
             try {
-                String result = createPlaylist(username, playlist, song);
+                String result = createPlaylist(request);
                 Gson gson = new Gson();
                 JsonResponse jsonResponse = new JsonResponse("OK", gson.toJson(result));
                 response.getWriter().println(jsonResponse.toJson());

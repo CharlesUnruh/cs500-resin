@@ -36,12 +36,16 @@ public class PlaylistInsertServlet extends HttpServlet {
     /**
      * Add a song from the playlist by querying the RDBMS
      * 
-     * @param arg_username
-     * @param arg_playlist
-     * @param arg_song
+     * @param request
+     *            - front end request
      * 
      */
-    public String addToPlaylist(String arg_username, String arg_playlist, String arg_song) throws SQLException {
+    public String addToPlaylist(HttpServletRequest request) throws SQLException {
+
+        // get the parameters from the request
+        String arg_username = request.getParameter("username");
+        String arg_playlist = request.getParameter("playlist");
+        String arg_song = request.getParameter("songname");
 
         String validation1 = "select U.username from Users U where U.username = ?;";
         String validation2 = "select PL.name from Playlists PL where PL.name = ?;";
@@ -79,8 +83,8 @@ public class PlaylistInsertServlet extends HttpServlet {
 
         if (!rs1.next()){ return "Error, user not found!"; }
         if (!rs2.next()){ return "Error, playlist not found!"; }
-        if (!rs3.next()){ return "Error, song not found!"; }
         if (!rs4.next()){ return "Error, playlist not associated with user!"; }
+        if (!rs3.next()){ return "Error, song not found!"; }
         if (rs5.next()){ return "Error, User's playlist already contains requested song!"; }
 
         // update the database, from the input parameters
@@ -98,7 +102,7 @@ public class PlaylistInsertServlet extends HttpServlet {
 
         // This is how we'll handle being safe from SQL injection
         // the set___ functions take the first number as the number of the
-        // question mark, in order of appearence, to replace.
+        // question mark, in order of appearance, to replace.
         // 1 means 1st question mark, 2 means 2nd, and so on.
         // the second argument is what to replace the question mark by.
         PreparedStatement preparedStatement1 = _DB.prepareStatement(query1);
@@ -142,16 +146,13 @@ public class PlaylistInsertServlet extends HttpServlet {
         // if I request http://resin.cci.drexel.edu/songlist?title=abc
         // title will have the value "abc" and the rest will be null
         // out.println(request.getQueryString());
-        String username = request.getParameter("username");
-        String playlist = request.getParameter("playlist");
-        String song = request.getParameter("song");
 
         if (!_message.startsWith("Servus")) {
             JsonResponse jsonResponse = new JsonResponse("ERROR", _message);
             response.getWriter().println(jsonResponse.toJson());
         } else {
             try {
-                String result = addToPlaylist(username, playlist, song);
+                String result = addToPlaylist(request);
                 Gson gson = new Gson();
                 JsonResponse jsonResponse = new JsonResponse("OK", gson.toJson(result));
                 response.getWriter().println(jsonResponse.toJson());

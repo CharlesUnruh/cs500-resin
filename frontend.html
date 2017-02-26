@@ -52,6 +52,38 @@ Playlist Demo Frontend
    <p id="PlaylistRequestReturn"></p>
 </div>
 
+<div id="PlaylistCreateDiv">
+   <p id="PlaylistCreateTitle"><h2>Create Playlist</h2></p>
+   <form id="PlaylistCreateForm">
+      Username:
+      <input type="text" id="PlaylistCreateUsername">
+      <br>
+      Playlist Name:
+      <input type="text" id="PlaylistCreatePlaylistName">
+      Song Title:
+      <input type="text" id="PlaylistCreateSongName">
+      <br>
+      <input type="button" value="Submit" id="PlaylistCreateFormSubmit">
+      <input type="button" value="Clear Results" id="PlaylistCreateFormClear">
+   </form>
+   <p id="PlaylistCreateReturn"></p>
+</div>
+
+<div id="PlaylistDeleteDiv">
+   <p id="PlaylistDeleteTitle"><h2>Delete Playlist</h2></p>
+   <form id="PlaylistDeleteForm">
+      Username:
+      <input type="text" id="PlaylistDeleteUsername">
+      <br>
+      Playlist Name:
+      <input type="text" id="PlaylistDeletePlaylistName">
+      <br>
+      <input type="button" value="Submit" id="PlaylistDeleteFormSubmit">
+      <input type="button" value="Clear Results" id="PlaylistDeleteFormClear">
+   </form>
+   <p id="PlaylistDeleteReturn"></p>
+</div>
+
 <div id="MusicianRequestDiv">
    <p id="MusicianRequestTitle"><h2>Query Musician Database</h2></p>
    <form id="MusicianRequestForm">
@@ -80,6 +112,10 @@ function init()
    btn_SongListRequest.addEventListener('click', getSongList, false);
    var btn_PlaylistRequest = document.getElementById("PlaylistRequestFormSubmit");
    btn_PlaylistRequest.addEventListener('click', getPlaylist, false);
+   var btn_PlaylistRequest = document.getElementById("PlaylistCreateFormSubmit");
+   btn_PlaylistRequest.addEventListener('click', createPlaylist, false);
+   var btn_PlaylistRequest = document.getElementById("PlaylistDeleteFormSubmit");
+   btn_PlaylistRequest.addEventListener('click', deletePlaylist, false);
    var btn_MusicianRequest = document.getElementById("MusicianRequestFormSubmit");
    btn_MusicianRequest.addEventListener('click', getMusician, false);
    var btn_SongListRequestClear = document.getElementById("SongListFormClear")
@@ -144,6 +180,55 @@ function getPlaylist()
 
    xhr.open('GET', request, true);
    xhr.onreadystatechange = function () {handlePlaylistRequest(xhr);} ;
+   xhr.send();
+}
+
+function createPlaylist()
+{
+   var xhr = new XMLHttpRequest();
+   var request = "http://resin.cci.drexel.edu:8080/~ceu24/playlistcreate?&";
+   var val = document.getElementById("PlaylistCreateUsername").value;
+   if (val != "") { request += "username=" + val + "&"; }
+   else { 
+      document.getElementById("PlaylistCreateUsername").innerHTML = "Please supply a user to create a playlist.";
+      return;
+   }
+   val = document.getElementById("PlaylistCreatePlaylistName").value;
+   if (val != "") { request += "playlistname=" + val + "&"; }
+   else { 
+      document.getElementById("PlaylistCreatePlaylistName").innerHTML = "Please supply a playlist name to create a playlist.";
+      return;
+   }
+   if (val != "") { request += "songname=" + val + "&"; }
+   else { 
+      document.getElementById("PlaylistCreateSongName").innerHTML = "Please supply a song name to create a playlist.";
+      return;
+   }
+
+   xhr.open('GET', request, true);
+   xhr.onreadystatechange = function () {handlePlaylistCreate(xhr);} ;
+   xhr.send();
+}
+
+function deletePlaylist()
+{
+   var xhr = new XMLHttpRequest();
+   var request = "http://resin.cci.drexel.edu:8080/~ceu24/playlistdelete?&";
+   var val = document.getElementById("PlaylistDeleteUsername").value;
+   if (val != "") { request += "username=" + val + "&"; }
+   else { 
+      document.getElementById("PlaylistDeleteUsername").innerHTML = "Please supply a user to delete a playlist.";
+      return;
+   }
+   val = document.getElementById("PlaylistDeletePlaylistName").value;
+   if (val != "") { request += "playlistname=" + val + "&"; }
+   else { 
+      document.getElementById("PlaylistDeletePlaylistName").innerHTML = "Please supply a playlist name to delete a playlist.";
+      return;
+   }
+
+   xhr.open('GET', request, true);
+   xhr.onreadystatechange = function () {handlePlaylistDelete(xhr);} ;
    xhr.send();
 }
 
@@ -238,6 +323,50 @@ function handlePlaylistRequest(xhr) {
       }
       output += "</table>";
       document.getElementById("PlaylistRequestReturn").innerHTML = output;
+   }
+}
+
+function handlePlaylistCreate(xhr) {
+   if (xhr.readyState == 4 && xhr.status == 200){
+      var response = JSON.parse(xhr.responseText);
+      var data = JSON.parse(response.data);
+
+      var output = "";
+
+      if (data.length == 0) {
+         document.getElementById("PlaylistCreateReturn").innerHTML = output;
+         return;
+      }
+
+      // Not sure how to handle the response !!
+      
+      var username = data[0].username;
+      var current_playlist = data[0].name;
+      output += "<h3>" + username + "'s \"" + current_playlist + "\" Playlist!</h3>";
+      output += "<p>Created on (" + data[0].createdDate + ") and last modified on (" + data[0].modifiedDate + ")</p>";
+      document.getElementById("PlaylistCreateReturn").innerHTML = output;
+   }
+}
+
+function handlePlaylistDelete(xhr) {
+   if (xhr.readyState == 4 && xhr.status == 200){
+      var response = JSON.parse(xhr.responseText);
+      var data = JSON.parse(response.data);
+
+      var output = "";
+
+      if (data.length == 0) {
+         document.getElementById("PlaylistDeleteReturn").innerHTML = output;
+         return;
+      }
+
+      // Not sure how to handle the response !!
+
+      var username = data[0].username;
+      var current_playlist = data[0].name;
+      output += "<h3>" + username + "'s \"" + current_playlist + "\" Playlist!</h3>";
+      output += "<p>Created on (" + data[0].createdDate + ") and last modified on (" + data[0].modifiedDate + ")</p>";
+      document.getElementById("PlaylistCreateReturn").innerHTML = output;
    }
 }
 
