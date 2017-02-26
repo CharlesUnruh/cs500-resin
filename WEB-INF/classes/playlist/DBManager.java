@@ -17,6 +17,7 @@ public class DBManager {
 
     private static Connection _conn = null;
     private static ResourceBundle _bundle;
+    private static boolean transaction_mode = false;
 
     /**
      * 
@@ -67,6 +68,58 @@ public class DBManager {
             System.out.println("Closed a connection");
         } catch (SQLException sqle) {
             sqle.printStackTrace(System.err);
+        }
+    }
+
+    /**
+     * Enable transaction mode.
+     */
+    public void enableTransactionMode() {
+        try {
+            _conn.setAutoCommit(false);
+            transaction_mode = true;
+        } catch ( SQLException sqle ) {
+            sqle.printStackTrace(System.err);
+        }
+    }
+
+    /**
+     * Disable transaction mode.
+     */
+    public void disableTransactionMode() {
+        try {
+            _conn.setAutoCommit(true);
+            transaction_mode = false;
+        } catch ( SQLException sqle ) {
+            sqle.printStackTrace(System.err);
+        }
+    }
+    
+    /**
+     * Commmit a transaction.
+     */
+    public void commit() {
+        if (transaction_mode) {
+            try {
+                _conn.commit();
+            } catch ( SQLException sqle ) {
+                sqle.printStackTrace(System.err);
+            }
+        }
+    }
+    
+    /**
+     * Abort Transaction.
+     */
+    public void abortTransaction() {
+        if (transaction_mode) {
+            try {
+                _conn.rollback();
+                _conn.setAutoCommit(false); 
+                transaction_mode = false;
+            } catch ( SQLException sqle ) {
+                sqle.printStackTrace(System.err);
+            }
         }
     }
 
