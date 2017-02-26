@@ -33,8 +33,17 @@ public class PlaylistRemoveServlet extends HttpServlet {
         _message = _DB.openDBConnection("PgBundle");
     }
 
+    /**
+     * Remove song from the playlist by querying the RDBMS
+     * 
+     * @param arg_username
+     * @param arg_playlist
+     * @param arg_song
+     * 
+     */
     public String removeFromPlaylist(String arg_username, String arg_playlist, String arg_song) throws SQLException {
 
+        // update the database, from the input parameters
         String query = "delete from UsersPlaylistsSongs_Xref UPS_X";
         query += "where UPS_X.uid = (select uid from Users U where U.username = ?),";
         query += "and UPS_X.pid = (select pid from Playlists P where P.name = ?),";
@@ -53,6 +62,7 @@ public class PlaylistRemoveServlet extends HttpServlet {
         ResultSet rs = preparedStatement.executeQuery();
         String result1 = rs.getString(1);
 
+        // get today's date and convert to sql date data type
         Date today = (Date) Calendar.getInstance().getTime();
 
         String query2 = "update Playlists P set modified = ";
@@ -77,10 +87,17 @@ public class PlaylistRemoveServlet extends HttpServlet {
 
     }
 
+    /**
+     * Process the request from the frontend and return a response
+     * 
+     * @param request
+     *            - from frontend
+     * @param response
+     *            - to frontend
+     */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
 
         // Query Strings are of the form arg=val&arg2=val2&arg3=val3
         // they show up at the end of the url like: <url>?<query-string>

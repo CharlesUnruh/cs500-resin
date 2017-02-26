@@ -33,14 +33,24 @@ public class PlaylistDisplayServlet extends HttpServlet {
         _message = _DB.openDBConnection("PgBundle");
     }
 
+    /**
+     * Generate the playlist by querying the RDBMS
+     * 
+     * @param request
+     *            - front end request
+     * 
+     */
     public ArrayList<Playlist> getPlaylist(HttpServletRequest request) throws SQLException {
 
+        // create the return object
         ArrayList<Playlist> playlistlist = new ArrayList<Playlist>();
 
+        // get the parameters from the request
         String arg_username = request.getParameter("username");
         String arg_playlistName = request.getParameter("playlistname");
         String exactPlaylistName = request.getParameter("exactplaylistname");
 
+        // retrieve from the database, information for the response
         String query = "select PL.name as \"Name\"";
         query += ", U.username as \"User\"";
         query += ", PL.created as \"Created\"";
@@ -78,6 +88,7 @@ public class PlaylistDisplayServlet extends HttpServlet {
         preparedStatement.setString(2, arg_playlistName);
         ResultSet rs = preparedStatement.executeQuery();
 
+        // build the return object
         while (rs.next()) {
             String name = rs.getString("Name");
             String username = rs.getString("User");
@@ -102,10 +113,17 @@ public class PlaylistDisplayServlet extends HttpServlet {
 
     }
 
+    /**
+     * Process the request from the frontend and return a response
+     * 
+     * @param request
+     *            - from frontend
+     * @param response
+     *            - to frontend
+     */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
 
         // Query Strings are of the form arg=val&arg2=val2&arg3=val3
         // they show up at the end of the url like: <url>?<query-string>

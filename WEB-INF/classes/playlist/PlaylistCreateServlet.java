@@ -35,6 +35,7 @@ public class PlaylistCreateServlet extends HttpServlet {
 
     public String createPlaylist(String arg_username, String arg_playlist, String arg_song) throws SQLException {
 
+        // get today's date and convert to sql date data type
         Date today = (Date) Calendar.getInstance().getTime();
 
         String query = "insert into Playlists (uid, pid, sid) values (";
@@ -78,10 +79,17 @@ public class PlaylistCreateServlet extends HttpServlet {
 
     }
 
+    /**
+     * Process the request from the frontend and return a response
+     * 
+     * @param request
+     *            - from frontend
+     * @param response
+     *            - to frontend
+     */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
 
         // Query Strings are of the form arg=val&arg2=val2&arg3=val3
         // they show up at the end of the url like: <url>?<query-string>

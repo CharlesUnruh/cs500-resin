@@ -23,9 +23,11 @@ public class Musician {
     /**
      * Constructor
      * 
-     * @param id
      * @param name
-     * @param gpa
+     * @param dob
+     * @param band
+     * @param album
+     * @param song
      */
     public Musician(String name, Date dob, String band, String album, String song) {
         this.name = name;
@@ -35,6 +37,12 @@ public class Musician {
         this.song = song;
     }
 
+    /**
+     * Converting to JSON
+     * 
+     * @return
+     * 
+     */
     public String toJson() {
         Gson gson = new Gson();
         return gson.toJson(this);

@@ -33,10 +33,19 @@ public class SongListServlet extends HttpServlet {
         _message = _DB.openDBConnection("PgBundle");
     }
 
+    /**
+     * Generate the song list by querying the RDBMS
+     * 
+     * @param request
+     *            - front end request
+     * 
+     */
     public ArrayList<Song> getSongList(HttpServletRequest request) throws SQLException {
 
+        // create the return object
         ArrayList<Song> songlist = new ArrayList<Song>();
 
+        // get the parameters from the request
         String arg_title = request.getParameter("title");
         String arg_band = request.getParameter("band");
         String arg_album = request.getParameter("album");
@@ -46,6 +55,7 @@ public class SongListServlet extends HttpServlet {
         String exactalbum = request.getParameter("exactalbum");
         String exactgenre = request.getParameter("exactgenre");
 
+        // retrieve from the database, information for the response
         String query = "select S.name as \"Title\"";
         query += ", S.duration as \"Duration\"";
         query += ", S.release_date as \"Release Date\"";
@@ -95,6 +105,7 @@ public class SongListServlet extends HttpServlet {
         preparedStatement.setString(4, arg_genre);
         ResultSet rs = preparedStatement.executeQuery();
 
+        // build the return object
         while (rs.next()) {
             String title = rs.getString("Title");
             int duration = rs.getInt("Duration");
@@ -114,10 +125,17 @@ public class SongListServlet extends HttpServlet {
 
     }
 
+    /**
+     * Process the request from the frontend and return a response
+     * 
+     * @param request
+     *            - from frontend
+     * @param response
+     *            - to frontend
+     */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
 
         // Query Strings are of the form arg=val&arg2=val2&arg3=val3
         // they show up at the end of the url like: <url>?<query-string>

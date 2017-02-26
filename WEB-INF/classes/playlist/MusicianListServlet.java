@@ -33,16 +33,25 @@ public class MusicianListServlet extends HttpServlet {
         _message = _DB.openDBConnection("PgBundle");
     }
 
+    /**
+     * Generate the musician list by querying the RDBMS
+     * 
+     * @param request
+     *            - front end request
+     */
     public ArrayList<Musician> getMusicianList(HttpServletRequest request, PrintWriter out) throws SQLException {
 
+        // create the return object
         ArrayList<Musician> musicianlist = new ArrayList<Musician>();
 
+        // get the parameters from the request
         String arg_name = request.getParameter("name");
         String exactname = request.getParameter("exactname");
         String getband = request.getParameter("getbands");
         String getalbum = request.getParameter("getalbums");
         String getsong = request.getParameter("getsongs");
 
+        // retrieve from the database, information for the response
         String query = "select distinct M.name as \"Name\"";
         query += ", M.dob as \"DOB\"";
         if (getband != null) {
@@ -81,6 +90,7 @@ public class MusicianListServlet extends HttpServlet {
         preparedStatement.setString(1, arg_name);
         ResultSet rs = preparedStatement.executeQuery();
 
+        // build the return object
         while (rs.next()) {
             String name = rs.getString("Name");
             Date dob = rs.getDate("DOB");
@@ -108,6 +118,14 @@ public class MusicianListServlet extends HttpServlet {
 
     }
 
+    /**
+     * Process the request from the frontend and return a response
+     * 
+     * @param request
+     *            - from frontend
+     * @param response
+     *            - to frontend
+     */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         response.setContentType("application/json");

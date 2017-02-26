@@ -24,9 +24,12 @@ public class Song {
     /**
      * Constructor
      * 
-     * @param id
-     * @param name
-     * @param gpa
+     * @param title
+     * @param duration
+     * @param releaseDate
+     * @param band
+     * @param album
+     * @param genre
      */
     public Song(String title, int duration, Date releaseDate, String band, String album, String genre) {
         this.title = title;
@@ -37,11 +40,23 @@ public class Song {
         this.genre = genre;
     }
 
+    /**
+     * Converting to JSON
+     * 
+     * @return
+     * 
+     */
     public String toJson() {
         Gson gson = new Gson();
         return gson.toJson(this);
     }
 
+    /**
+     * Converting to HTML
+     * 
+     * @return
+     * 
+     */
     public String toHTML() {
         return "<tr><td>" + title + "</td><td>" + duration + "</td><td>" + releaseDate + "</td><td>" + band
                 + "</td><td>" + album + "</td><td>" + genre + "</td><td></tr>";

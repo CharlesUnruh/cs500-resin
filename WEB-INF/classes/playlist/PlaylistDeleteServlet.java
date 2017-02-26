@@ -31,8 +31,16 @@ public class PlaylistDeleteServlet extends HttpServlet {
         _message = _DB.openDBConnection("PgBundle");
     }
 
+    /**
+     * Remove song from the playlist by querying the RDBMS
+     * 
+     * @param arg_username
+     * @param arg_playlist
+     * 
+     */
     public String deletePlaylist(String arg_username, String arg_playlist) throws SQLException {
 
+        // update the database, from the input parameters
         String query = "delete from UsersPlaylistsSongs_Xref UPS_X";
         query += "where UPS_X.uid = (select uid from Users U where U.username = ?),";
         query += "and UPS_X.pid = (select pid from Playlists P where P.name = ?),";
@@ -73,7 +81,6 @@ public class PlaylistDeleteServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
 
         // Query Strings are of the form arg=val&arg2=val2&arg3=val3
         // they show up at the end of the url like: <url>?<query-string>

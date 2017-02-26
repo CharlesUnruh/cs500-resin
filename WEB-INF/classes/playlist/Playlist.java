@@ -52,6 +52,12 @@ public class Playlist {
         this.releaseDate = releaseDate;
     }
 
+    /**
+     * Converting to JSON
+     * 
+     * @return
+     * 
+     */
     public String toJson() {
         Gson gson = new Gson();
         return gson.toJson(this);
