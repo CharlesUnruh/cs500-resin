@@ -52,6 +52,26 @@ Playlist Demo Frontend
    <p id="PlaylistRequestReturn"></p>
 </div>
 
+<div id="PlaylistInsertDiv">
+   <p id="PlaylistInsertTitle"><h2>Insert Existing Song Into Existing Playlist</h2></p>
+   <form id="PlaylistInsertForm">
+      Username:
+      <input type="text" id="PlaylistInsertUsername">
+      <br>
+      Playlist Name:
+      <input type="text" id="PlaylistInsertPlaylistName">
+      Exact Match:
+      <input type="checkbox" name="exactplaylistname" value=true id="PlaylistInsertMatchPlaylistName">
+      <br>
+      Song Title:
+      <input type="text" id="PlaylistInsertSongName">
+      <br>
+      <input type="button" value="Submit" id="PlaylistInsertFormSubmit">
+      <input type="button" value="Clear Results" id="PlaylistInsertFormClear">
+   </form>
+   <p id="PlaylistInsertReturn"></p>
+</div>
+
 <div id="PlaylistCreateDiv">
    <p id="PlaylistCreateTitle"><h2>Create Playlist</h2></p>
    <form id="PlaylistCreateForm">
@@ -60,6 +80,7 @@ Playlist Demo Frontend
       <br>
       Playlist Name:
       <input type="text" id="PlaylistCreatePlaylistName">
+      <br>
       Song Title:
       <input type="text" id="PlaylistCreateSongName">
       <br>
@@ -112,23 +133,39 @@ function init()
    btn_SongListRequest.addEventListener('click', getSongList, false);
    var btn_PlaylistRequest = document.getElementById("PlaylistRequestFormSubmit");
    btn_PlaylistRequest.addEventListener('click', getPlaylist, false);
+   var btn_PlaylistInsert = document.getElementById("PlaylistInsertFormSubmit");
+   btn_PlaylistInsert.addEventListener('click', insertPlaylist, false);
    var btn_PlaylistRequest = document.getElementById("PlaylistCreateFormSubmit");
    btn_PlaylistRequest.addEventListener('click', createPlaylist, false);
    var btn_PlaylistRequest = document.getElementById("PlaylistDeleteFormSubmit");
    btn_PlaylistRequest.addEventListener('click', deletePlaylist, false);
    var btn_MusicianRequest = document.getElementById("MusicianRequestFormSubmit");
    btn_MusicianRequest.addEventListener('click', getMusician, false);
-   var btn_SongListRequestClear = document.getElementById("SongListFormClear")
+
+   var btn_SongListRequestClear = document.getElementById("SongListFormClear");
    btn_SongListRequestClear.addEventListener('click', function() { clear("SongListReturn");}, false);
-   var btn_PlaylistRequestClear = document.getElementById("PlaylistRequestFormClear")
+   var btn_PlaylistRequestClear = document.getElementById("PlaylistRequestFormClear");
    btn_PlaylistRequestClear.addEventListener('click', function() { clear("PlaylistRequestReturn");}, false);
-   var btn_MusicianRequestClear = document.getElementById("MusicianRequestFormClear")
+   var btn_PlaylistInsertClear = document.getElementById("PlaylistInsertFormClear");
+   btn_PlaylistInsertClear.addEventListener('click', function() { clear("PlaylistInsertReturn");}, false);
+   var btn_MusicianRequestClear = document.getElementById("MusicianRequestFormClear");
    btn_MusicianRequestClear.addEventListener('click', function() { clear("MusicianRequestReturn");}, false);
+   var btn_PlaylistInsertClear = document.getElementById("PlaylistInsertFormClear");
+   btn_PlaylistInsertClear.addEventListenet('click', function() { clear("PlaylistInsertReturn");}, false);
 }
 
 function clear(id)
 {
    document.getElementById(id).innerHTML = "";
+}
+
+function handleRequestString(xhr,id)
+{
+   if (xhr.readyState == 4 && xhr.status == 200){
+      var response = JSON.parse(xhr.responseText);
+      var data = JSON.parse(response.data);
+      document.getElementById(id).innerHTML = data;
+   }
 }
 
 function getSongList()
@@ -180,6 +217,32 @@ function getPlaylist()
 
    xhr.open('GET', request, true);
    xhr.onreadystatechange = function () {handlePlaylistRequest(xhr);} ;
+   xhr.send();
+}
+
+function insertPlaylist()
+{
+   var xhr = new XMLHttpRequest();
+   var request = "http://resin.cci.drexel.edu:8080/~ceu24/playlistinsert?&";
+   var val = document.getElementById("PlaylistInsertUsername").value;
+   if (val != "") { request += "username=" + val + "&"; }
+   else { document.getElementById("PlaylistInsertReturn").innerHTML = "Please specify a Username."; return;}
+
+   val = document.getElementById("PlaylistInsertPlaylistName").value;
+   if (val != "") { request += "playlist=" + val + "&"; }
+   else { document.getElementById("PlaylistInsertReturn").innerHTML = "Please specify a Playlist Name."; return;}
+
+   val = document.getElementById("PlaylistInsertSongName").value;
+   if (val != "") { request += "songname=" + val + "&"; }
+   else { document.getElementById("PlaylistInsertReturn").innerHTML = "Please specify a Song Name."; return;}
+
+   
+   if (document.getElementById("PlaylistInsertMatchPlaylistName").checked){ 
+      request += "exactplaylistname=true" + "&";
+   }
+
+   xhr.open('GET', request, true);
+   xhr.onreadystatechange = function () {handleRequestString(xhr,"PlaylistInsertReturn");} ;
    xhr.send();
 }
 
