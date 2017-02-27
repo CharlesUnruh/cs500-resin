@@ -3,7 +3,6 @@ package playlist;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -47,25 +46,44 @@ public class PlaylistCreateServlet extends HttpServlet {
         String arg_playlist = request.getParameter("playlist");
         String arg_song = request.getParameter("song");
 
+        String validation1 = "select U.username from Users U where U.username = ?;";
+        String validation3 = "select S.name from Songs S where S.name = ?;";
+        String validation4 = "select *";
+        validation4 += " from Users U";
+        validation4 += " inner join UsersPlaylistsSongs_Xref UPS_X on ( U.username = ? and U.uid = UPS_X.uid )";
+        validation4 += " inner join Playlists PL on ( PL.name = ? and PL.pid = UPS_X.pid )";
+        validation4 += ";";
+
+        PreparedStatement validationStatement1 = _DB.prepareStatement(validation1);
+        validationStatement1.setString(1, arg_username);
+        PreparedStatement validationStatement3 = _DB.prepareStatement(validation3);
+        validationStatement3.setString(1, arg_song);
+        PreparedStatement validationStatement4 = _DB.prepareStatement(validation4);
+        validationStatement4.setString(1, arg_username);
+        validationStatement4.setString(2, arg_playlist);
+        ResultSet rs1 = validationStatement1.executeQuery();
+        ResultSet rs3 = validationStatement3.executeQuery();
+        ResultSet rs4 = validationStatement4.executeQuery();
+
+        if (!rs1.next()) {
+            return "Error, user not found!";
+        }
+        if (!rs3.next()) {
+            return "Error, song not found!";
+        }
+        if (rs4.next()) {
+            return "Error, playlist is already associated with user!";
+        }
+
         // get today's date and convert to sql date data type
-        Date today = (Date) Calendar.getInstance().getTime();
+        java.sql.Date today = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 
         // update the database, from the input parameters
-        String query = "insert into Playlists (uid, pid, sid) values (";
-        query += " ? ,";
-        query += today + ",";
-        query += today + ")";
-        query += ";";
-
-        // This is how we'll handle being safe from SQL injection
-        // the set___ functions take the first number as the number of the
-        // question mark, in order of appearance, to replace.
-        // 1 means 1st question mark, 2 means 2nd, and so on.
-        // the second argument is what to replace the question mark by.
-        PreparedStatement preparedStatement = _DB.prepareStatement(query);
-        preparedStatement.setString(1, arg_playlist);
-        ResultSet rs = preparedStatement.executeQuery();
-        String result1 = rs.getString(1);
+        String query1 = "insert into Playlists (uid, pid, sid) values (";
+        query1 += " ? ,";
+        query1 += today + ",";
+        query1 += today + ")";
+        query1 += ";";
 
         // update the database, from the input parameters
         String query2 = "insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (";
@@ -79,17 +97,25 @@ public class PlaylistCreateServlet extends HttpServlet {
         // question mark, in order of appearance, to replace.
         // 1 means 1st question mark, 2 means 2nd, and so on.
         // the second argument is what to replace the question mark by.
-        preparedStatement = _DB.prepareStatement(query2);
-        preparedStatement.setString(1, arg_username);
-        preparedStatement.setString(2, arg_playlist);
-        preparedStatement.setString(3, arg_song);
-        rs = preparedStatement.executeQuery();
-        String result2 = rs.getString(1);
+        PreparedStatement preparedStatement1 = _DB.prepareStatement(query1);
+        preparedStatement1.setString(1, arg_playlist);
 
-        rs.close();
-        preparedStatement.close();
+        PreparedStatement preparedStatement2 = _DB.prepareStatement(query2);
+        preparedStatement2.setString(1, arg_username);
+        preparedStatement2.setString(2, arg_playlist);
+        preparedStatement2.setString(3, arg_song);
 
-        return result2;
+        _DB.enableTransactionMode();
+        preparedStatement1.executeUpdate();
+        preparedStatement2.executeUpdate();
+
+        _DB.commit();
+        _DB.disableTransactionMode();
+
+        preparedStatement1.close();
+        preparedStatement2.close();
+
+        return "Success";
 
     }
 
@@ -122,6 +148,7 @@ public class PlaylistCreateServlet extends HttpServlet {
                 JsonResponse jsonResponse = new JsonResponse("OK", gson.toJson(result));
                 response.getWriter().println(jsonResponse.toJson());
             } catch (Exception e) {
+                _DB.abortTransaction();
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
                 e.printStackTrace(pw);

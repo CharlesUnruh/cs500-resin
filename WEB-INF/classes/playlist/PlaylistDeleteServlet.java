@@ -43,22 +43,40 @@ public class PlaylistDeleteServlet extends HttpServlet {
         String arg_username = request.getParameter("username");
         String arg_playlist = request.getParameter("playlist");
 
-        // update the database, from the input parameters
-        String query = "delete from UsersPlaylistsSongs_Xref UPS_X";
-        query += "where UPS_X.uid = (select uid from Users U where U.username = ?),";
-        query += "and UPS_X.pid = (select pid from Playlists P where P.name = ?),";
-        query += ";";
+        String validation1 = "select U.username from Users U where U.username = ?;";
+        String validation2 = "select PL.name from Playlists PL where PL.name = ?;";
+        String validation4 = "select *";
+        validation4 += " from Users U";
+        validation4 += " inner join UsersPlaylistsSongs_Xref UPS_X on ( U.username = ? and U.uid = UPS_X.uid )";
+        validation4 += " inner join Playlists PL on ( PL.name = ? and PL.pid = UPS_X.pid )";
+        validation4 += ";";
 
-        // This is how we'll handle being safe from SQL injection
-        // the set___ functions take the first number as the number of the
-        // question mark, in order of appearance, to replace.
-        // 1 means 1st question mark, 2 means 2nd, and so on.
-        // the second argument is what to replace the question mark by.
-        PreparedStatement preparedStatement = _DB.prepareStatement(query);
-        preparedStatement.setString(1, arg_username);
-        preparedStatement.setString(2, arg_playlist);
-        ResultSet rs = preparedStatement.executeQuery();
-        String result1 = rs.getString(1);
+        PreparedStatement validationStatement1 = _DB.prepareStatement(validation1);
+        validationStatement1.setString(1, arg_username);
+        PreparedStatement validationStatement2 = _DB.prepareStatement(validation2);
+        validationStatement2.setString(1, arg_playlist);
+        PreparedStatement validationStatement4 = _DB.prepareStatement(validation4);
+        validationStatement4.setString(1, arg_username);
+        validationStatement4.setString(2, arg_playlist);
+        ResultSet rs1 = validationStatement1.executeQuery();
+        ResultSet rs2 = validationStatement2.executeQuery();
+        ResultSet rs4 = validationStatement4.executeQuery();
+
+        if (!rs1.next()) {
+            return "Error, user not found!";
+        }
+        if (!rs2.next()) {
+            return "Error, playlist not found!";
+        }
+        if (!rs4.next()) {
+            return "Error, playlist not associated with user!";
+        }
+
+        // update the database, from the input parameters
+        String query1 = "delete from UsersPlaylistsSongs_Xref UPS_X";
+        query1 += "where UPS_X.uid = (select uid from Users U where U.username = ?),";
+        query1 += "and UPS_X.pid = (select pid from Playlists P where P.name = ?),";
+        query1 += ";";
 
         String query2 = "delete from Playlists P ";
         query2 += "where P.name = ?),";
@@ -69,15 +87,24 @@ public class PlaylistDeleteServlet extends HttpServlet {
         // question mark, in order of appearance, to replace.
         // 1 means 1st question mark, 2 means 2nd, and so on.
         // the second argument is what to replace the question mark by.
-        preparedStatement = _DB.prepareStatement(query2);
-        preparedStatement.setString(1, arg_playlist);
-        rs = preparedStatement.executeQuery();
-        String result2 = rs.getString(1);
+        PreparedStatement preparedStatement1 = _DB.prepareStatement(query1);
+        preparedStatement1.setString(1, arg_username);
+        preparedStatement1.setString(2, arg_playlist);
 
-        rs.close();
-        preparedStatement.close();
+        PreparedStatement preparedStatement2 = _DB.prepareStatement(query2);
+        preparedStatement2.setString(1, arg_playlist);
 
-        return result2;
+        _DB.enableTransactionMode();
+        preparedStatement1.executeUpdate();
+        preparedStatement2.executeUpdate();
+
+        _DB.commit();
+        _DB.disableTransactionMode();
+
+        preparedStatement1.close();
+        preparedStatement2.close();
+
+        return "Success";
 
     }
 
@@ -102,6 +129,7 @@ public class PlaylistDeleteServlet extends HttpServlet {
                 JsonResponse jsonResponse = new JsonResponse("OK", gson.toJson(result));
                 response.getWriter().println(jsonResponse.toJson());
             } catch (Exception e) {
+                _DB.abortTransaction();
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
                 e.printStackTrace(pw);

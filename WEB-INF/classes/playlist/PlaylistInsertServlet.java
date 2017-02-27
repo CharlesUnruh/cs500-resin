@@ -6,7 +6,6 @@ import java.io.StringWriter;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Date;
 import java.util.Calendar;
 
 import javax.servlet.ServletException;
@@ -51,41 +50,51 @@ public class PlaylistInsertServlet extends HttpServlet {
         String validation2 = "select PL.name from Playlists PL where PL.name = ?;";
         String validation3 = "select S.name from Songs S where S.name = ?;";
         String validation4 = "select *";
-            validation4 += " from Users U";
-            validation4 += " inner join UsersPlaylistsSongs_Xref UPS_X on ( U.username = ? and U.uid = UPS_X.uid )";
-            validation4 += " inner join Playlists PL on ( PL.name = ? and PL.pid = UPS_X.pid )";
-            validation4 += ";";
+        validation4 += " from Users U";
+        validation4 += " inner join UsersPlaylistsSongs_Xref UPS_X on ( U.username = ? and U.uid = UPS_X.uid )";
+        validation4 += " inner join Playlists PL on ( PL.name = ? and PL.pid = UPS_X.pid )";
+        validation4 += ";";
         String validation5 = "select *";
-            validation5 += " from Users U";
-            validation5 += " inner join UsersPlaylistsSongs_Xref UPS_X on ( U.username = ? and U.uid = UPS_X.uid )";
-            validation5 += " inner join Playlists PL on ( PL.name = ? and PL.pid = UPS_X.pid )";
-            validation5 += " inner join Songs S on ( S.name = ? and S.sid = UPS_X.sid)";
-            validation5 += ";";
-        
+        validation5 += " from Users U";
+        validation5 += " inner join UsersPlaylistsSongs_Xref UPS_X on ( U.username = ? and U.uid = UPS_X.uid )";
+        validation5 += " inner join Playlists PL on ( PL.name = ? and PL.pid = UPS_X.pid )";
+        validation5 += " inner join Songs S on ( S.name = ? and S.sid = UPS_X.sid)";
+        validation5 += ";";
+
         PreparedStatement validationStatement1 = _DB.prepareStatement(validation1);
-        validationStatement1.setString(1,arg_username);
+        validationStatement1.setString(1, arg_username);
         PreparedStatement validationStatement2 = _DB.prepareStatement(validation2);
-        validationStatement2.setString(1,arg_playlist);
+        validationStatement2.setString(1, arg_playlist);
         PreparedStatement validationStatement3 = _DB.prepareStatement(validation3);
-        validationStatement3.setString(1,arg_song);
+        validationStatement3.setString(1, arg_song);
         PreparedStatement validationStatement4 = _DB.prepareStatement(validation4);
-        validationStatement4.setString(1,arg_username);
-        validationStatement4.setString(2,arg_playlist);
+        validationStatement4.setString(1, arg_username);
+        validationStatement4.setString(2, arg_playlist);
         PreparedStatement validationStatement5 = _DB.prepareStatement(validation5);
-        validationStatement5.setString(1,arg_username);
-        validationStatement5.setString(2,arg_playlist);
-        validationStatement5.setString(3,arg_song);
+        validationStatement5.setString(1, arg_username);
+        validationStatement5.setString(2, arg_playlist);
+        validationStatement5.setString(3, arg_song);
         ResultSet rs1 = validationStatement1.executeQuery();
         ResultSet rs2 = validationStatement2.executeQuery();
         ResultSet rs3 = validationStatement3.executeQuery();
         ResultSet rs4 = validationStatement4.executeQuery();
         ResultSet rs5 = validationStatement5.executeQuery();
 
-        if (!rs1.next()){ return "Error, user not found!"; }
-        if (!rs2.next()){ return "Error, playlist not found!"; }
-        if (!rs4.next()){ return "Error, playlist not associated with user!"; }
-        if (!rs3.next()){ return "Error, song not found!"; }
-        if (rs5.next()){ return "Error, User's playlist already contains requested song!"; }
+        if (!rs1.next()) {
+            return "Error, user not found!";
+        }
+        if (!rs2.next()) {
+            return "Error, playlist not found!";
+        }
+        if (!rs4.next()) {
+            return "Error, playlist not associated with user!";
+        }
+        if (!rs3.next()) {
+            return "Error, song not found!";
+        }
+        if (rs5.next()) {
+            return "Error, User's playlist already contains requested song!";
+        }
 
         // update the database, from the input parameters
         String query1 = "insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (";
@@ -170,7 +179,7 @@ public class PlaylistInsertServlet extends HttpServlet {
                 JsonResponse jsonResponse = new JsonResponse("OK", gson.toJson(result));
                 response.getWriter().println(jsonResponse.toJson());
             } catch (Exception e) {
-                _DB.abortTransaction();                
+                _DB.abortTransaction();
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
                 e.printStackTrace(pw);
