@@ -6,8 +6,8 @@ import java.io.StringWriter;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Date;
 import java.util.Calendar;
-import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -34,61 +34,109 @@ public class PlaylistRemoveServlet extends HttpServlet {
     }
 
     /**
-     * Remove song from the playlist by querying the RDBMS
+     * Add a song from the playlist by querying the RDBMS
      * 
      * @param request
      *            - front end request
      * 
      */
-    public String removeFromPlaylist(HttpServletRequest request) throws SQLException {
+    public String addToPlaylist(HttpServletRequest request) throws SQLException {
 
         // get the parameters from the request
         String arg_username = request.getParameter("username");
         String arg_playlist = request.getParameter("playlist");
-        String arg_song = request.getParameter("song");
+        String arg_song = request.getParameter("songname");
+
+        String validation1 = "select U.username from Users U where U.username = ?;";
+        String validation2 = "select PL.name from Playlists PL where PL.name = ?;";
+        String validation3 = "select S.name from Songs S where S.name = ?;";
+        String validation4 = "select *";
+            validation4 += " from Users U";
+            validation4 += " inner join UsersPlaylistsSongs_Xref UPS_X on ( U.username = ? and U.uid = UPS_X.uid )";
+            validation4 += " inner join Playlists PL on ( PL.name = ? and PL.pid = UPS_X.pid )";
+            validation4 += ";";
+        String validation5 = "select *";
+            validation5 += " from Users U";
+            validation5 += " inner join UsersPlaylistsSongs_Xref UPS_X on ( U.username = ? and U.uid = UPS_X.uid )";
+            validation5 += " inner join Playlists PL on ( PL.name = ? and PL.pid = UPS_X.pid )";
+            validation5 += " inner join Songs S on ( S.name = ? and S.sid = UPS_X.sid)";
+            validation5 += ";";
+        
+        PreparedStatement validationStatement1 = _DB.prepareStatement(validation1);
+        validationStatement1.setString(1,arg_username);
+        PreparedStatement validationStatement2 = _DB.prepareStatement(validation2);
+        validationStatement2.setString(1,arg_playlist);
+        PreparedStatement validationStatement3 = _DB.prepareStatement(validation3);
+        validationStatement3.setString(1,arg_song);
+        PreparedStatement validationStatement4 = _DB.prepareStatement(validation4);
+        validationStatement4.setString(1,arg_username);
+        validationStatement4.setString(2,arg_playlist);
+        PreparedStatement validationStatement5 = _DB.prepareStatement(validation5);
+        validationStatement5.setString(1,arg_username);
+        validationStatement5.setString(2,arg_playlist);
+        validationStatement5.setString(3,arg_song);
+        ResultSet rs1 = validationStatement1.executeQuery();
+        ResultSet rs2 = validationStatement2.executeQuery();
+        ResultSet rs3 = validationStatement3.executeQuery();
+        ResultSet rs4 = validationStatement4.executeQuery();
+        ResultSet rs5 = validationStatement5.executeQuery();
+
+        if (!rs1.next()){ return "Error, user not found!"; }
+        if (!rs2.next()){ return "Error, playlist not found!"; }
+        if (!rs4.next()){ return "Error, playlist not associated with user!"; }
+        if (!rs3.next()){ return "Error, song not found!"; }
+        if (!rs5.next()){ return "Error, User's playlist doesn't contain requested song!"; }
 
         // update the database, from the input parameters
-        String query = "delete from UsersPlaylistsSongs_Xref UPS_X";
-        query += "where UPS_X.uid = (select uid from Users U where U.username = ?),";
-        query += "and UPS_X.pid = (select pid from Playlists P where P.name = ?),";
-        query += "and UPS_X.sid = (select sid from Songs S where S.name = ?),";
-        query += ";";
-
-        // This is how we'll handle being safe from SQL injection
-        // the set___ functions take the first number as the number of the
-        // question mark, in order of appearance, to replace.
-        // 1 means 1st question mark, 2 means 2nd, and so on.
-        // the second argument is what to replace the question mark by.
-        PreparedStatement preparedStatement = _DB.prepareStatement(query);
-        preparedStatement.setString(1, arg_username);
-        preparedStatement.setString(2, arg_playlist);
-        preparedStatement.setString(3, arg_song);
-        ResultSet rs = preparedStatement.executeQuery();
-        String result1 = rs.getString(1);
+        String query1 = "delete from UsersPlaylistsSongs_Xref UPS_X";
+        query1 += " where UPS_X.uid = (select uid from Users U where U.username = ?)";
+        query1 += " and UPS_X.pid = (select pid from Playlists P where P.name = ?)";
+        query1 += " and UPS_X.sid = (select sid from Songs S where S.name = ?)";
+        query1 += ";";
 
         // get today's date and convert to sql date data type
-        Date today = (Date) Calendar.getInstance().getTime();
-
-        // update the database, from the input parameters
-        String query2 = "update Playlists P set modified = ";
-        query2 += today;
-        query2 += " where P.name = ?";
-        query2 += ";";
+        java.sql.Date today = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+        String query2 = "with playlist as (";
+            query2 += "select pl.pid, pl.modified";
+            query2 += " from playlists as pl";
+            query2 += " inner join UsersPlaylistsSongs_Xref as UPS_X";
+            query2 += " on ( UPS_X.pid = pl.pid and pl.name = ? )";
+            query2 += " inner join Users as U";
+            query2 += " on ( UPS_X.uid = U.uid and U.username = ? )";
+            query2 += " group by pl.pid";
+            query2 += " )";
+            query2 += " update Playlists";
+            query2 += " set modified = ?";
+            query2 += " from playlist";
+            query2 += " where playlists.pid = playlist.pid";
+            query2 += ";";
 
         // This is how we'll handle being safe from SQL injection
         // the set___ functions take the first number as the number of the
         // question mark, in order of appearance, to replace.
         // 1 means 1st question mark, 2 means 2nd, and so on.
         // the second argument is what to replace the question mark by.
-        preparedStatement = _DB.prepareStatement(query2);
-        preparedStatement.setString(1, arg_playlist);
-        rs = preparedStatement.executeQuery();
-        String result2 = rs.getString(1);
+        PreparedStatement preparedStatement1 = _DB.prepareStatement(query1);
+        preparedStatement1.setString(1, arg_username);
+        preparedStatement1.setString(2, arg_playlist);
+        preparedStatement1.setString(3, arg_song);
 
-        rs.close();
-        preparedStatement.close();
+        PreparedStatement preparedStatement2 = _DB.prepareStatement(query2);
+        preparedStatement2.setString(1, arg_playlist);
+        preparedStatement2.setString(2, arg_username);
+        preparedStatement2.setDate(3, today);
 
-        return result2;
+        _DB.enableTransactionMode();
+        preparedStatement1.executeUpdate();
+        preparedStatement2.executeUpdate();
+
+        _DB.commit();
+        _DB.disableTransactionMode();
+
+        preparedStatement1.close();
+        preparedStatement2.close();
+
+        return "Success";
 
     }
 
@@ -116,12 +164,12 @@ public class PlaylistRemoveServlet extends HttpServlet {
             response.getWriter().println(jsonResponse.toJson());
         } else {
             try {
-                String result = removeFromPlaylist(request);
+                String result = addToPlaylist(request);
                 Gson gson = new Gson();
-                // need to determine return string
                 JsonResponse jsonResponse = new JsonResponse("OK", gson.toJson(result));
                 response.getWriter().println(jsonResponse.toJson());
             } catch (Exception e) {
+                _DB.abortTransaction();                
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
                 e.printStackTrace(pw);

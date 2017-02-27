@@ -96,9 +96,21 @@ public class PlaylistInsertServlet extends HttpServlet {
 
         // get today's date and convert to sql date data type
         java.sql.Date today = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-        String query2 = "update Playlists P set modified = ?";
-        query2 += " where P.name = ?";
-        query2 += ";";
+        String query2 = "with playlist as (";
+            query2 += "select pl.pid, pl.modified";
+            query2 += " from playlists as pl";
+            query2 += " inner join UsersPlaylistsSongs_Xref as UPS_X";
+            query2 += " on ( UPS_X.pid = pl.pid and pl.name = ? )";
+            query2 += " inner join Users as U";
+            query2 += " on ( UPS_X.uid = U.uid and U.username = ? )";
+            query2 += " group by pl.pid";
+            query2 += " )";
+            query2 += " update Playlists";
+            query2 += " set modified = ?";
+            query2 += " from playlist";
+            query2 += " where playlists.pid = playlist.pid";
+            query2 += ";";
+
 
         // This is how we'll handle being safe from SQL injection
         // the set___ functions take the first number as the number of the
@@ -111,8 +123,9 @@ public class PlaylistInsertServlet extends HttpServlet {
         preparedStatement1.setString(3, arg_song);
 
         PreparedStatement preparedStatement2 = _DB.prepareStatement(query2);
-        preparedStatement2.setDate(1, today);
-        preparedStatement2.setString(2, arg_playlist);
+        preparedStatement2.setString(1, arg_playlist);
+        preparedStatement2.setString(2, arg_username);
+        preparedStatement2.setDate(3, today);
 
         _DB.enableTransactionMode();
         preparedStatement1.executeUpdate();

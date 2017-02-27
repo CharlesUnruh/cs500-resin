@@ -72,6 +72,26 @@ Playlist Demo Frontend
    <p id="PlaylistInsertReturn"></p>
 </div>
 
+<div id="PlaylistRemoveDiv">
+   <p id="PlaylistRemoveTitle"><h2>Remove Song From Playlist</h2></p>
+   <form id="PlaylistRemoveForm">
+      Username:
+      <input type="text" id="PlaylistRemoveUsername">
+      <br>
+      Playlist Name:
+      <input type="text" id="PlaylistRemovePlaylistName">
+      Exact Match:
+      <input type="checkbox" name="exactplaylistname" value=true id="PlaylistRemoveMatchPlaylistName">
+      <br>
+      Song Title:
+      <input type="text" id="PlaylistRemoveSongName">
+      <br>
+      <input type="button" value="Submit" id="PlaylistRemoveFormSubmit">
+      <input type="button" value="Clear Results" id="PlaylistRemoveFormClear">
+   </form>
+   <p id="PlaylistRemoveReturn"></p>
+</div>
+
 <div id="PlaylistCreateDiv">
    <p id="PlaylistCreateTitle"><h2>Create Playlist</h2></p>
    <form id="PlaylistCreateForm">
@@ -135,6 +155,9 @@ function init()
    btn_PlaylistRequest.addEventListener('click', getPlaylist, false);
    var btn_PlaylistInsert = document.getElementById("PlaylistInsertFormSubmit");
    btn_PlaylistInsert.addEventListener('click', insertPlaylist, false);
+   var btn_PlaylistRemove = document.getElementById("PlaylistRemoveFormSubmit");
+   btn_PlaylistRemove.addEventListener('click', removePlaylist, false);
+  
    var btn_PlaylistRequest = document.getElementById("PlaylistCreateFormSubmit");
    btn_PlaylistRequest.addEventListener('click', createPlaylist, false);
    var btn_PlaylistRequest = document.getElementById("PlaylistDeleteFormSubmit");
@@ -148,10 +171,11 @@ function init()
    btn_PlaylistRequestClear.addEventListener('click', function() { clear("PlaylistRequestReturn");}, false);
    var btn_PlaylistInsertClear = document.getElementById("PlaylistInsertFormClear");
    btn_PlaylistInsertClear.addEventListener('click', function() { clear("PlaylistInsertReturn");}, false);
+   var btn_PlaylistRemoveClear = document.getElementById("PlaylistRemoveFormClear");
+   btn_PlaylistRemoveClear.addEventListener('click', function() { clear("PlaylistRemoveReturn");}, false);
+   
    var btn_MusicianRequestClear = document.getElementById("MusicianRequestFormClear");
    btn_MusicianRequestClear.addEventListener('click', function() { clear("MusicianRequestReturn");}, false);
-   var btn_PlaylistInsertClear = document.getElementById("PlaylistInsertFormClear");
-   btn_PlaylistInsertClear.addEventListenet('click', function() { clear("PlaylistInsertReturn");}, false);
 }
 
 function clear(id)
@@ -243,6 +267,32 @@ function insertPlaylist()
 
    xhr.open('GET', request, true);
    xhr.onreadystatechange = function () {handleRequestString(xhr,"PlaylistInsertReturn");} ;
+   xhr.send();
+}
+
+function removePlaylist()
+{
+   var xhr = new XMLHttpRequest();
+   var request = "http://resin.cci.drexel.edu:8080/~ceu24/playlistremove?&";
+   var val = document.getElementById("PlaylistRemoveUsername").value;
+   if (val != "") { request += "username=" + val + "&"; }
+   else { document.getElementById("PlaylistRemoveReturn").innerHTML = "Please specify a Username."; return;}
+
+   val = document.getElementById("PlaylistRemovePlaylistName").value;
+   if (val != "") { request += "playlist=" + val + "&"; }
+   else { document.getElementById("PlaylistRemoveReturn").innerHTML = "Please specify a Playlist Name."; return;}
+
+   val = document.getElementById("PlaylistRemoveSongName").value;
+   if (val != "") { request += "songname=" + val + "&"; }
+   else { document.getElementById("PlaylistRemoveReturn").innerHTML = "Please specify a Song Name."; return;}
+
+   
+   if (document.getElementById("PlaylistRemoveMatchPlaylistName").checked){ 
+      request += "exactplaylistname=true" + "&";
+   }
+
+   xhr.open('GET', request, true);
+   xhr.onreadystatechange = function () {handleRequestString(xhr,"PlaylistRemoveReturn");} ;
    xhr.send();
 }
 

@@ -13,7 +13,7 @@ drop table UsersPlaylistsSongs_Xref cascade;
 
 create table Songs (
     sid             bigserial       not null primary key,
-    name            varchar(128)    not null,
+    name            varchar(128)    unique not null,
     duration        integer,
     release_date    date
     );
