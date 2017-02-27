@@ -41,7 +41,7 @@ public class PlaylistDeleteServlet extends HttpServlet {
 
         // get the parameters from the request
         String arg_username = request.getParameter("username");
-        String arg_playlist = request.getParameter("playlist");
+        String arg_playlist = request.getParameter("playlistname");
 
         String validation1 = "select U.username from Users U where U.username = ?;";
         String validation2 = "select PL.name from Playlists PL where PL.name = ?;";
@@ -74,13 +74,23 @@ public class PlaylistDeleteServlet extends HttpServlet {
 
         // update the database, from the input parameters
         String query1 = "delete from UsersPlaylistsSongs_Xref UPS_X";
-        query1 += "where UPS_X.uid = (select uid from Users U where U.username = ?),";
-        query1 += "and UPS_X.pid = (select pid from Playlists P where P.name = ?),";
+        query1 += " where UPS_X.uid = (select uid from Users U where U.username = ?)";
+        query1 += " and UPS_X.pid = (select pid from Playlists P where P.name = ?)";
         query1 += ";";
 
-        String query2 = "delete from Playlists P ";
-        query2 += "where P.name = ?),";
-        query2 += ";";
+        String query2 = "with playlist as (";
+            query2 += "select pl.pid, pl.modified";
+            query2 += " from playlists as pl";
+            query2 += " inner join UsersPlaylistsSongs_Xref as UPS_X";
+            query2 += " on ( UPS_X.pid = pl.pid and pl.name = ? )";
+            query2 += " inner join Users as U";
+            query2 += " on ( UPS_X.uid = U.uid and U.username = ? )";
+            query2 += " group by pl.pid";
+            query2 += " )";
+            query2 += " delete from only playlists";
+            query2 += " using playlist";
+            query2 += " where playlists.pid = playlist.pid";
+            query2 += ";";
 
         // This is how we'll handle being safe from SQL injection
         // the set___ functions take the first number as the number of the
@@ -93,6 +103,7 @@ public class PlaylistDeleteServlet extends HttpServlet {
 
         PreparedStatement preparedStatement2 = _DB.prepareStatement(query2);
         preparedStatement2.setString(1, arg_playlist);
+        preparedStatement2.setString(2, arg_username);
 
         _DB.enableTransactionMode();
         preparedStatement1.executeUpdate();

@@ -157,11 +157,10 @@ function init()
    btn_PlaylistInsert.addEventListener('click', insertPlaylist, false);
    var btn_PlaylistRemove = document.getElementById("PlaylistRemoveFormSubmit");
    btn_PlaylistRemove.addEventListener('click', removePlaylist, false);
-  
-   var btn_PlaylistRequest = document.getElementById("PlaylistCreateFormSubmit");
-   btn_PlaylistRequest.addEventListener('click', createPlaylist, false);
-   var btn_PlaylistRequest = document.getElementById("PlaylistDeleteFormSubmit");
-   btn_PlaylistRequest.addEventListener('click', deletePlaylist, false);
+   var btn_PlaylistCreate = document.getElementById("PlaylistCreateFormSubmit");
+   btn_PlaylistCreate.addEventListener('click', createPlaylist, false);
+   var btn_PlaylistDelete = document.getElementById("PlaylistDeleteFormSubmit");
+   btn_PlaylistDelete.addEventListener('click', deletePlaylist, false);
    var btn_MusicianRequest = document.getElementById("MusicianRequestFormSubmit");
    btn_MusicianRequest.addEventListener('click', getMusician, false);
 
@@ -173,7 +172,10 @@ function init()
    btn_PlaylistInsertClear.addEventListener('click', function() { clear("PlaylistInsertReturn");}, false);
    var btn_PlaylistRemoveClear = document.getElementById("PlaylistRemoveFormClear");
    btn_PlaylistRemoveClear.addEventListener('click', function() { clear("PlaylistRemoveReturn");}, false);
-   
+   var btn_PlaylistCreateClear = document.getElementById("PlaylistCreateFormClear");
+   btn_PlaylistCreateClear.addEventListener('click', function() { clear("PlaylistCreateReturn");}, false);
+   var btn_PlaylistDeleteClear = document.getElementById("PlaylistDeleteFormClear");
+   btn_PlaylistDeleteClear.addEventListener('click', function() { clear("PlaylistDeleteReturn");}, false);
    var btn_MusicianRequestClear = document.getElementById("MusicianRequestFormClear");
    btn_MusicianRequestClear.addEventListener('click', function() { clear("MusicianRequestReturn");}, false);
 }
@@ -303,23 +305,24 @@ function createPlaylist()
    var val = document.getElementById("PlaylistCreateUsername").value;
    if (val != "") { request += "username=" + val + "&"; }
    else { 
-      document.getElementById("PlaylistCreateUsername").innerHTML = "Please supply a user to create a playlist.";
+      document.getElementById("PlaylistCreateReturn").innerHTML = "Please supply a user to create a playlist.";
       return;
    }
    val = document.getElementById("PlaylistCreatePlaylistName").value;
    if (val != "") { request += "playlistname=" + val + "&"; }
    else { 
-      document.getElementById("PlaylistCreatePlaylistName").innerHTML = "Please supply a playlist name to create a playlist.";
+      document.getElementById("PlaylistCreateReturn").innerHTML = "Please supply a playlist name to create a playlist.";
       return;
    }
+   val = document.getElementById("PlaylistCreateSongName").value;
    if (val != "") { request += "songname=" + val + "&"; }
    else { 
-      document.getElementById("PlaylistCreateSongName").innerHTML = "Please supply a song name to create a playlist.";
+      document.getElementById("PlaylistCreateReturn").innerHTML = "Please supply a song name to create a playlist.";
       return;
    }
 
    xhr.open('GET', request, true);
-   xhr.onreadystatechange = function () {handlePlaylistCreate(xhr);} ;
+   xhr.onreadystatechange = function () {handleRequestString(xhr,"PlaylistCreateReturn");} ;
    xhr.send();
 }
 
@@ -330,18 +333,18 @@ function deletePlaylist()
    var val = document.getElementById("PlaylistDeleteUsername").value;
    if (val != "") { request += "username=" + val + "&"; }
    else { 
-      document.getElementById("PlaylistDeleteUsername").innerHTML = "Please supply a user to delete a playlist.";
+      document.getElementById("PlaylistDeleteReturn").innerHTML = "Please supply a user to delete a playlist.";
       return;
    }
    val = document.getElementById("PlaylistDeletePlaylistName").value;
    if (val != "") { request += "playlistname=" + val + "&"; }
    else { 
-      document.getElementById("PlaylistDeletePlaylistName").innerHTML = "Please supply a playlist name to delete a playlist.";
+      document.getElementById("PlaylistDeleteReturn").innerHTML = "Please supply a playlist name to delete a playlist.";
       return;
    }
 
    xhr.open('GET', request, true);
-   xhr.onreadystatechange = function () {handlePlaylistDelete(xhr);} ;
+   xhr.onreadystatechange = function () {handleRequestString(xhr,"PlaylistDeleteReturn");} ;
    xhr.send();
 }
 
@@ -422,7 +425,7 @@ function handlePlaylistRequest(xhr) {
             current_playlist = data[i].name;
             output += "</table>";
             output += "<h3>" + username + "'s \"" + current_playlist + "\" Playlist!</h3>";
-            output += "<p>Created on (" + data[i].createdDate + ") and last modified on (" + data[i].modifiedDate + "</p>";
+            output += "<p>Created on (" + data[i].createdDate + ") and last modified on (" + data[i].modifiedDate + ")</p>";
             output += "<table><tr><td>Title</td><td>Duration</td><td>Album</td><td>Band</td><td>Release Date</td><td>Genre</td></tr>";
          }
          output += "<tr>";

@@ -43,8 +43,8 @@ public class PlaylistCreateServlet extends HttpServlet {
 
         // get the parameters from the request
         String arg_username = request.getParameter("username");
-        String arg_playlist = request.getParameter("playlist");
-        String arg_song = request.getParameter("song");
+        String arg_playlist = request.getParameter("playlistname");
+        String arg_song = request.getParameter("songname");
 
         String validation1 = "select U.username from Users U where U.username = ?;";
         String validation3 = "select S.name from Songs S where S.name = ?;";
@@ -79,17 +79,17 @@ public class PlaylistCreateServlet extends HttpServlet {
         java.sql.Date today = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 
         // update the database, from the input parameters
-        String query1 = "insert into Playlists (uid, pid, sid) values (";
-        query1 += " ? ,";
-        query1 += today + ",";
-        query1 += today + ")";
+        String query1 = "insert into Playlists (name, created, modified) values (";
+        query1 += " ?,";
+        query1 += " ?,";
+        query1 += "?)";
         query1 += ";";
 
         // update the database, from the input parameters
         String query2 = "insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (";
         query2 += "(select uid from Users U where U.username = ?),";
         query2 += "(select pid from Playlists P where P.name = ?),";
-        query2 += "(select sid from Songs S where S.name = ?),";
+        query2 += "(select sid from Songs S where S.name = ?))";
         query2 += ";";
 
         // This is how we'll handle being safe from SQL injection
@@ -99,6 +99,8 @@ public class PlaylistCreateServlet extends HttpServlet {
         // the second argument is what to replace the question mark by.
         PreparedStatement preparedStatement1 = _DB.prepareStatement(query1);
         preparedStatement1.setString(1, arg_playlist);
+        preparedStatement1.setDate(2, today);
+        preparedStatement1.setDate(3, today);
 
         PreparedStatement preparedStatement2 = _DB.prepareStatement(query2);
         preparedStatement2.setString(1, arg_username);
