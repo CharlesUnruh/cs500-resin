@@ -820,11 +820,15 @@ insert into Playlists (name, created, modified) values ('Marc''s Rock', '2017-02
 insert into Playlists (name, created, modified) values ('Charle''s Music', '2017-02-25', '2017-02-25');
 insert into Playlists (name, created, modified) values ('Charle''s Rock', '2017-02-25', '2017-02-25');
 
+
 create table UsersPlaylistsSongs_Xref (
        uid      bigint      not null,
        pid      bigint      not null,
        sid      bigint      not null,
-    primary key(uid,pid,sid)
+       foreign key(uid) references Users(uid),
+       foreign key(pid) references Playlists(pid),
+       foreign key(sid) references Songs(sid),
+       primary key(uid,pid,sid)
     );
 
 insert into UsersPlaylistsSongs_Xref (uid, pid, sid) values (2, 1, 1);
